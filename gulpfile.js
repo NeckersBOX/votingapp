@@ -6,8 +6,9 @@ const webpack = require ('webpack-stream');
 const del = require ('del');
 
 const files = {
-  sass: 'src/sass/*.sass',
-  js: 'src/app-client.js'
+  sass: 'src/sass/**/*.sass',
+  js: 'src/**/*.js',
+  dist: 'dist/**/*.js'
 };
 
 gulp.task ('sass', () => gulp.src (files.sass)
@@ -15,7 +16,7 @@ gulp.task ('sass', () => gulp.src (files.sass)
   .pipe (gulp.dest ('dist/css'))
 );
 
-gulp.task ('webpack', () => gulp.src (files.js)
+gulp.task ('webpack', () => gulp.src ('src/app-client.js')
   .pipe (webpack ({
     output: {
       filename: 'bundle.js'
@@ -37,5 +38,6 @@ gulp.task ('clean', () => del ([ 'babel_cache' ]));
 
 gulp.task ('watch', () => {
   gulp.watch (files.sass, [ 'sass' ]);
-  gulp.watch (files.js, [ 'webpack', 'clean' ]);
+  gulp.watch (files.js, [ 'webpack' ]);
+  gulp.watch (files.dist, [ 'clean' ]);
 });
