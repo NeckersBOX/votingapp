@@ -21623,8 +21623,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = AppRouter = _react2.default.createClass({
-	  displayName: 'AppRouter',
+	exports.default = _react2.default.createClass({
+	  displayName: 'AppRoutes',
 	  render: function render() {
 	    return _react2.default.createElement(_reactRouter.Router, { history: _reactRouter.browserHistory, routes: _routes2.default, onUpade: function onUpade() {
 	        return window.scrollto(0, 0);
@@ -26865,13 +26865,13 @@
 
 	var _reactRouter = __webpack_require__(180);
 
-	var _Layout = __webpack_require__(237);
-
-	var _Layout2 = _interopRequireDefault(_Layout);
-
-	var _IndexPage = __webpack_require__(238);
+	var _IndexPage = __webpack_require__(237);
 
 	var _IndexPage2 = _interopRequireDefault(_IndexPage);
+
+	var _Layout = __webpack_require__(238);
+
+	var _Layout2 = _interopRequireDefault(_Layout);
 
 	var _PullPage = __webpack_require__(239);
 
@@ -26909,18 +26909,17 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = Layout = _react2.default.createClass({
-	  displayName: "Layout",
+	exports.default = _react2.default.createClass({
+	  displayName: "IndexPage",
 	  render: function render() {
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "container-fluid" },
+	      { className: "col-sm-12" },
 	      _react2.default.createElement(
-	        "h1",
-	        { className: "text-center" },
-	        "Voting App"
-	      ),
-	      this.props.children
+	        "h2",
+	        null,
+	        "IndexPage"
+	      )
 	    );
 	  }
 	});
@@ -26941,17 +26940,18 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = IndexPage = _react2.default.createClass({
-	  displayName: "IndexPage",
+	exports.default = _react2.default.createClass({
+	  displayName: "Layout",
 	  render: function render() {
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "col-sm-12" },
+	      { className: "container-fluid" },
 	      _react2.default.createElement(
-	        "h2",
-	        null,
-	        "IndexPage"
-	      )
+	        "h1",
+	        { className: "text-center" },
+	        "Voting App"
+	      ),
+	      this.props.children
 	    );
 	  }
 	});
@@ -26972,7 +26972,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = PullPage = _react2.default.createClass({
+	exports.default = _react2.default.createClass({
 	  displayName: "PullPage",
 	  render: function render() {
 	    return _react2.default.createElement(
@@ -27003,7 +27003,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = NotFoundPage = _react2.default.createClass({
+	exports.default = _react2.default.createClass({
 	  displayName: "NotFoundPage",
 	  render: function render() {
 	    return _react2.default.createElement(

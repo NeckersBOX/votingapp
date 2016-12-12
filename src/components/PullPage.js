@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default PullPage = React.createClass ({
+export default React.createClass ({
   render () {
     return (
       <div className="col-sm-12">
