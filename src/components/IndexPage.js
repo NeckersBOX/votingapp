@@ -1,11 +1,12 @@
 import React from 'react';
+import Paper from 'material-ui/Paper';
 
 export default React.createClass ({
   render () {
     return (
-      <div className="col-sm-12">
-        <h2>IndexPage</h2>
-      </div>
+      <Paper style={{ padding: '8px' }}>
+        <h2 className="text-center">Create custom polls with live results.</h2>
+      </Paper>
     );
   }
 });

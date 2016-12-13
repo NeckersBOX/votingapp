@@ -1,2 +1,15 @@
 body {
   margin: 0; }
+
+.appbar-btn {
+  margin-top: 6px; }
+
+.main {
+  margin: 8px; }
+
+.text-center {
+  text-align: center; }
+
+h1, h2, h3, h4, h5, h6 {
+  color: #00bcd4;
+  letter-spacing: 0.3px; }
