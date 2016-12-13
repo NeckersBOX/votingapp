@@ -5,7 +5,7 @@ import routes from '../routes';
 export default React.createClass ({
   render () {
     return (
-      <Router history={browserHistory} routes={routes} onUpade={() => window.scrollto (0, 0)} />
+      <Router history={browserHistory} routes={routes} onUpdate={() => window.scrollTo (0, 0)} />
     );
   }
 });

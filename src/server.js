@@ -1,8 +1,12 @@
 import { Server } from 'http';
 import Express from 'express';
 import React from 'react';
+import path from 'path';
 import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
 import routes from './routes';
 import NotFoundPage from './components/NotFoundPage';
 
@@ -26,12 +30,22 @@ app.get('*', (req, res) => {
       }
 
       let markup;
+      const muiTheme = getMuiTheme ({userAgent: req.headers['user-agent']});
 
       if (renderProps) {
-        markup = renderToString (<RouterContext {...renderProps}/>);
+        markup = renderToString (
+          <MuiThemeProvider muiTheme={muiTheme}>
+            <RouterContext {...renderProps} />
+          </MuiThemeProvider>
+        );
       }
       else {
-        markup = renderToString (<NotFoundPage/>);
+        markup = renderToString (
+          <MuiThemeProvider muiTheme={muiTheme}>
+            <NotFoundPage />
+          </MuiThemeProvider>
+        );
+        
         res.status (404);
       }
 
