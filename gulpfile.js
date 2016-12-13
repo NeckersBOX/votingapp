@@ -35,6 +35,7 @@ gulp.task ('webpack', () => gulp.src ('src/app-client.js')
 );
 
 gulp.task ('clean', () => del ([ 'babel_cache' ]));
+gulp.task ('build', [ 'sass', 'webpack' ]);
 
 gulp.task ('watch', () => {
   gulp.watch (files.sass, [ 'sass' ]);

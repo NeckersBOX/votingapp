@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "release": "git push github master",
-    "start": "node index.js"
+    "start": "node_modules/.bin/babel-node --presets 'react,es2015' src/server.js",
+    "watch": "gulp watch",
+    "dev-start": "gulp build && gulp clean && npm start"
   },
   "repository": {
     "type": "git",
