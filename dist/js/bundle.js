@@ -42798,12 +42798,18 @@
 
 	exports.default = _react2.default.createClass({
 	  displayName: 'Layout',
+	  componentDidMount: function componentDidMount() {
+	    if (this.props.state.io === null) {
+	      this.props.dispatch({ type: 'SET_SOCKET_IO', data: (0, _socket2.default)() });
+	    }
+	  },
 	  render: function render() {
 	    var buttonStyle = {
 	      backgroundColor: 'transparent',
 	      color: 'white'
 	    };
-	    console.log(this.props);
+	    console.log(this.props.state);
+
 	    return _react2.default.createElement(
 	      'div',
 	      null,
