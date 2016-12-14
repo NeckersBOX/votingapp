@@ -6,6 +6,9 @@ import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+
+injectTapEventPlugin ();
 
 import routes from './routes';
 import NotFoundPage from './components/NotFoundPage';
@@ -45,7 +48,7 @@ app.get('*', (req, res) => {
             <NotFoundPage />
           </MuiThemeProvider>
         );
-        
+
         res.status (404);
       }
 

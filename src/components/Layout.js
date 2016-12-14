@@ -1,6 +1,7 @@
 import React from 'react';
 import AppBar from 'material-ui/AppBar';
 import FlatButton from 'material-ui/FlatButton';
+import { Link } from 'react-router';
 
 export default React.createClass ({
   render () {
@@ -13,7 +14,12 @@ export default React.createClass ({
       <div>
         <AppBar title="Voting App" showMenuIconButton={false} iconElementRight={
           <div className="appbar-btn">
-            <FlatButton label="Sign Up" style={buttonStyle} />
+            <Link to="/">
+              <FlatButton label="Home" style={buttonStyle} />
+            </Link>
+            <Link to="/signup">
+              <FlatButton label="Sign Up" style={buttonStyle} />
+            </Link>
             <FlatButton label="Login" style={buttonStyle} />
           </div>
         }>
