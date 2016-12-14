@@ -12,7 +12,7 @@ export default React.createClass ({
 
     return (
       <div>
-        <AppBar title="Voting App" showMenuIconButton={false} iconElementRight={
+        <AppBar title="Vote!" showMenuIconButton={false} iconElementRight={
           <div className="appbar-btn">
             <Link to="/">
               <FlatButton label="Home" style={buttonStyle} />

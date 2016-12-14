@@ -7,6 +7,8 @@ import { match, RouterContext } from 'react-router';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import SocketIO from 'socket.io';
+
 
 injectTapEventPlugin ();
 
@@ -15,6 +17,7 @@ import NotFoundPage from './components/NotFoundPage';
 
 const app = new Express ();
 const server = new Server (app);
+const io = SocketIO (server);
 
 app.set ('view engine', 'ejs');
 app.set ('views', path.join (__dirname, 'views'));
@@ -57,7 +60,11 @@ app.get('*', (req, res) => {
   );
 });
 
+io.on ('connection', (socket) => {
+  console.log ('Connection!!')
+});
+
 server.listen (process.env.PORT || 3000, err => {
   if ( err ) return console.error (err);
-  console.info ('Server running.');
+  console.log ('Server running.');
 });

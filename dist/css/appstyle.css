@@ -18,5 +18,8 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.3px; }
 
 .align-center {
-  display: flex;
-  margin: auto; }
+  display: block;
+  text-align: center; }
+
+.muted {
+  color: rgba(0, 0, 0, 0.6); }
