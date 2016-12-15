@@ -166,7 +166,10 @@ export default React.createClass ({
     });
 
     this.props.state.io.on ('signup', (data) => {
-      if ( data.error === null ) {
+      if ( 'server_error' in data ) {
+        console.warn (data.server_error);
+      }
+      else if ( data.error === null ) {
         console.log ('All OK! User registered!');
       }
       else {
