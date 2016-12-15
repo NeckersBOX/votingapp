@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "release": "git push github master",
     "start-server": "node_modules/.bin/babel-node --presets 'react,es2015' src/server.js",
     "stop-server": ": $(killall node nodejs)",
     "watch": "gulp watch",
-    "dev-start": "gulp build && gulp clean && npm start"
+    "dev-start": "gulp build && npm run start-server && gulp watch"
   },
   "repository": {
     "type": "git",
