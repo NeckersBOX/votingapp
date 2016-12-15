@@ -1,8 +1,6 @@
 const initState = {
   io: null,
-  trending: [],
-  popular: [],
-  latest: []
+  user: null
 };
 
 const voteReducer = (state, action) => {
@@ -19,6 +17,7 @@ const voteReducer = (state, action) => {
 };
 
 const setSocketIO = (state, action) => Object.assign ({}, state, { io: action.data });
+
 const emitSocketIO = (state, action) => {
   if ( state.io === null ) {
     console.warn ('emitSocketIO: Failed emit, IO null.');

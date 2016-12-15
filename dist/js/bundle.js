@@ -37465,9 +37465,7 @@
 	});
 	var initState = {
 	  io: null,
-	  trending: [],
-	  popular: [],
-	  latest: []
+	  user: null
 	};
 
 	var voteReducer = function voteReducer(state, action) {
@@ -37486,6 +37484,7 @@
 	var setSocketIO = function setSocketIO(state, action) {
 	  return Object.assign({}, state, { io: action.data });
 	};
+
 	var emitSocketIO = function emitSocketIO(state, action) {
 	  if (state.io === null) {
 	    console.warn('emitSocketIO: Failed emit, IO null.');
@@ -53422,6 +53421,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	exports.default = _react2.default.createClass({
 	  displayName: 'SignUpPage',
 	  getInitialState: function getInitialState() {
@@ -53598,13 +53599,28 @@
 	    this.setState({ password_force: force });
 	  },
 	  signUp: function signUp() {
-	    console.log('Sign Up!');
-	    console.log(this.state);
+	    var _this = this;
 
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
 	      api: 'signup',
 	      data: this.state
+	    });
+
+	    this.props.state.io.on('signup', function (data) {
+	      if (data.error === null) {
+	        console.log('All OK! User registered!');
+	      } else {
+	        var _this$setState;
+
+	        _this.setState((_this$setState = {}, _defineProperty(_this$setState, data.field, {
+	          text: _this.state[data.field].text,
+	          valid: false,
+	          error: data.error
+	        }), _defineProperty(_this$setState, 'button_disabled', true), _this$setState));
+	      }
+
+	      _this.props.state.io.removeListener('signup');
 	    });
 	  }
 	});

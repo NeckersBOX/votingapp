@@ -159,13 +159,28 @@ export default React.createClass ({
     this.setState ({ password_force: force });
   },
   signUp () {
-    console.log ('Sign Up!');
-    console.log (this.state);
-
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
       api: 'signup',
       data: this.state
+    });
+
+    this.props.state.io.on ('signup', (data) => {
+      if ( data.error === null ) {
+        console.log ('All OK! User registered!');
+      }
+      else {
+        this.setState ({
+          [data.field]: {
+            text: this.state[data.field].text,
+            valid: false,
+            error: data.error
+          },
+          button_disabled: true
+        });
+      }
+
+      this.props.state.io.removeListener ('signup');
     });
   }
 });
