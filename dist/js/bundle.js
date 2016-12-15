@@ -37476,14 +37476,24 @@
 	  }
 
 	  var callbacks = {
-	    'SET_SOCKET_IO': setSocketIO
+	    'SET_SOCKET_IO': setSocketIO,
+	    'EMIT_SOCKET_IO': emitSocketIO
 	  };
 
-	  return callbacks[action.type](state, action.data);
+	  return callbacks[action.type](state, action);
 	};
 
-	var setSocketIO = function setSocketIO(state, data) {
-	  return Object.assign({}, state, { io: data });
+	var setSocketIO = function setSocketIO(state, action) {
+	  return Object.assign({}, state, { io: action.data });
+	};
+	var emitSocketIO = function emitSocketIO(state, action) {
+	  if (state.io === null) {
+	    console.warn('emitSocketIO: Failed emit, IO null.');
+	    return state;
+	  }
+
+	  state.io.emit(action.api, action.data);
+	  return state;
 	};
 
 	exports.default = voteReducer;
@@ -42808,7 +42818,6 @@
 	      backgroundColor: 'transparent',
 	      color: 'white'
 	    };
-	    console.log(this.props.state);
 
 	    return _react2.default.createElement(
 	      'div',
@@ -53417,11 +53426,12 @@
 	  displayName: 'SignUpPage',
 	  getInitialState: function getInitialState() {
 	    return {
-	      name: '',
-	      email: '',
-	      password: '',
+	      name: { text: '', valid: false, error: null },
+	      email: { text: '', valid: false, error: null },
+	      password: { text: '', valid: false, error: null },
 	      password_force: 0,
-	      password_confirm: ''
+	      password_confirm: { text: '', valid: false, error: null },
+	      button_disabled: true
 	    };
 	  },
 	  render: function render() {
@@ -53436,37 +53446,42 @@
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
-	        _react2.default.createElement(_TextField2.default, { hintText: 'Email', id: 'email', name: 'user_mail', type: 'email',
-	          value: this.state.email, onChange: this.changeMail })
+	        _react2.default.createElement(_TextField2.default, { hintText: 'Email', id: 'email', name: 'user_mail', type: 'text',
+	          value: this.state.email.text, errorText: this.state.email.error,
+	          onChange: this.changeMail })
 	      ),
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
 	        _react2.default.createElement(_TextField2.default, { hintText: 'Username', id: 'username', name: 'user_name', type: 'text',
-	          value: this.state.name, onChange: this.changeName })
+	          value: this.state.name.text, errorText: this.state.name.error,
+	          onChange: this.changeName })
 	      ),
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
 	        _react2.default.createElement(_TextField2.default, { hintText: 'Password', id: 'password', name: 'user_pass', type: 'password',
-	          value: this.state.password, onChange: this.changePassword })
+	          value: this.state.password.text, errorText: this.state.password.error,
+	          onChange: this.changePassword })
 	      ),
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
-	        _react2.default.createElement(_LinearProgress2.default, { style: { width: '256px', margin: 'auto' }, mode: 'determinate',
-	          value: this.state.password_force })
+	        _react2.default.createElement(_LinearProgress2.default, { style: { width: '256px', margin: 'auto', marginTop: '1em' },
+	          mode: 'determinate', value: this.state.password_force })
 	      ),
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
 	        _react2.default.createElement(_TextField2.default, { hintText: 'Confirm Password', id: 'password2', name: 'user_pass2', type: 'password',
-	          value: this.state.password_confirm, onChange: this.confirmPassword })
+	          value: this.state.password_confirm.text, errorText: this.state.password_confirm.error,
+	          onChange: this.confirmPassword })
 	      ),
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
-	        _react2.default.createElement(_RaisedButton2.default, { primary: true, label: 'Sign up and start publish', onClick: this.signUp })
+	        _react2.default.createElement(_RaisedButton2.default, { style: { marginTop: '1em' }, primary: true, onClick: this.signUp,
+	          label: 'Sign up and start publish', disabled: this.state.button_disabled })
 	      ),
 	      _react2.default.createElement(
 	        'p',
@@ -53480,23 +53495,117 @@
 	    );
 	  },
 	  changeMail: function changeMail(e) {
-	    /* TODO Validate */
-	    this.setState({ email: e.target.value });
+	    var mail_re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+	    if (mail_re.test(e.target.value)) {
+	      var validate = this.state.name.valid && this.state.password.valid && this.state.password_confirm.valid;
+
+	      this.setState({
+	        email: { text: e.target.value, valid: true, error: null },
+	        button_disabled: !validate
+	      });
+	      return;
+	    }
+
+	    this.setState({
+	      email: {
+	        text: e.target.value,
+	        valid: false,
+	        error: 'Please insert a valid email address.'
+	      }
+	    });
 	  },
 	  changeName: function changeName(e) {
-	    this.setState({ name: e.target.value });
+	    if (e.target.value.length < 6) {
+	      this.setState({
+	        name: {
+	          text: e.target.value,
+	          valid: false,
+	          error: 'Minimum length 6 characters'
+	        }
+	      });
+
+	      return;
+	    }
+
+	    var validate = this.state.email.valid && this.state.password.valid && this.state.password_confirm.valid;
+
+	    this.setState({
+	      name: { text: e.target.value, valid: true, error: null },
+	      button_disabled: !validate
+	    });
 	  },
 	  changePassword: function changePassword(e) {
-	    /* TODO Check security */
-	    this.setState({ password: e.target.value });
+	    try {
+	      if (e.target.value.length < 8) {
+	        throw 'Minimum length 8 characters';
+	        return;
+	      }
+
+	      var validate = this.state.name.valid && this.state.email.valid && this.state.password_confirm.valid;
+
+	      this.setState({
+	        password: { text: e.target.value, valid: true, error: null },
+	        button_disabled: !validate
+	      });
+	    } catch (err) {
+	      this.setState({ password: { text: e.target.value, valid: false, error: err } });
+	    }
+
+	    this.changeForce(e.target.value);
 	  },
 	  confirmPassword: function confirmPassword(e) {
-	    /* TODO Check if == */
-	    this.setState({ password_confirm: e.target.value });
+	    if (e.target.value != this.state.password.text) {
+	      this.setState({
+	        password_confirm: {
+	          text: e.target.value,
+	          valid: false,
+	          error: 'Invalid Password'
+	        }
+	      });
+
+	      return;
+	    }
+
+	    var validate = this.state.name.valid && this.state.email.valid && this.state.password.valid;
+
+	    this.setState({
+	      password_confirm: { text: e.target.value, valid: true, error: null },
+	      button_disabled: !validate
+	    });
+	  },
+	  changeForce: function changeForce(password) {
+	    var force = 0;
+	    var variations = {
+	      digits: /\d/.test(password),
+	      lower: /[a-z]/.test(password),
+	      upper: /[A-Z]/.test(password),
+	      nonWords: /\W/.test(password)
+	    };
+
+	    var letters = new Object();
+	    for (var j = 0; j < password.length; j++) {
+	      letters[password[j]] = (letters[password[j]] || 0) + 1;
+	      force += 5.0 / letters[password[j]];
+	    }
+
+	    var variationCount = 0;
+	    for (var check in variations) {
+	      variationCount += variations[check] == true ? 1 : 0;
+	    }force += (variationCount - 1) * 10;
+
+	    force = force > 100 ? 100 : Math.floor(force);
+	    this.setState({ password_force: force });
 	  },
 	  signUp: function signUp() {
 	    console.log('Sign Up!');
 	    console.log(this.state);
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'signup',
+	      data: this.state
+	    });
 	  }
 	});
 
