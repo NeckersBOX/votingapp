@@ -17,7 +17,7 @@ export default React.createClass ({
     };
 
     /* TODO: Add class hide-sm ( and hide-md, hide-lg? ) and show-* in the same way. */
-    
+
     let AppBarMenu = null;
     if ( typeof this.props.state == 'undefined' || !this.props.state.user  ) {
       AppBarMenu = (
@@ -42,7 +42,9 @@ export default React.createClass ({
           </Link>
           <FlatButton label="New Pull" style={buttonStyle} />
           <FlatButton label="My Pull" style={buttonStyle} />
-          <FlatButton label="Logout" style={buttonStyle} />
+          <Link to="/logout">
+            <FlatButton label="Logout" style={buttonStyle} />
+          </Link>
         </div>
       );
     }

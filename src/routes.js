@@ -4,6 +4,7 @@ import IndexPage from './components/IndexPage';
 import Layout from './components/Layout';
 import SignUpPage from './components/SignUpPage';
 import LoginPage from './components/LoginPage';
+import LogoutPage from './components/LogoutPage';
 import NotFoundPage from './components/NotFoundPage';
 
 const routes = (
@@ -11,6 +12,7 @@ const routes = (
     <IndexRoute component={IndexPage} />
     <Route path="signup" component={SignUpPage} />
     <Route path="login" component={LoginPage} />
+    <Route path="logout" component={LogoutPage} />
     <Route path="*" component={NotFoundPage} />
   </Route>
 );

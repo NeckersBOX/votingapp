@@ -205,11 +205,11 @@ export default React.createClass ({
   signUp () {
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
-      api: 'signup',
+      api: 'signup:req',
       data: Object.assign ({}, this.state, { $user: this.props.state.user })
     });
 
-    this.props.state.io.on ('signup', (data) => {
+    this.props.state.io.on ('signup:res', (data) => {
       if ( 'server_error' in data ) {
         console.warn (data.server_error);
       }
@@ -227,7 +227,7 @@ export default React.createClass ({
         });
       }
 
-      this.props.state.io.removeListener ('signup');
+      this.props.state.io.removeListener ('signup:res');
     });
   }
 });

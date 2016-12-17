@@ -37534,7 +37534,11 @@
 
 	var _LoginPage2 = _interopRequireDefault(_LoginPage);
 
-	var _NotFoundPage = __webpack_require__(586);
+	var _LogoutPage = __webpack_require__(586);
+
+	var _LogoutPage2 = _interopRequireDefault(_LogoutPage);
+
+	var _NotFoundPage = __webpack_require__(587);
 
 	var _NotFoundPage2 = _interopRequireDefault(_NotFoundPage);
 
@@ -37546,6 +37550,7 @@
 	  _react2.default.createElement(_reactRouter.IndexRoute, { component: _IndexPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'signup', component: _SignUpPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'login', component: _LoginPage2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'logout', component: _LogoutPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundPage2.default })
 	);
 
@@ -42828,6 +42833,8 @@
 	      color: 'white'
 	    };
 
+	    /* TODO: Add class hide-sm ( and hide-md, hide-lg? ) and show-* in the same way. */
+
 	    var AppBarMenu = null;
 	    if (typeof this.props.state == 'undefined' || !this.props.state.user) {
 	      AppBarMenu = _react2.default.createElement(
@@ -42860,7 +42867,11 @@
 	        ),
 	        _react2.default.createElement(_FlatButton2.default, { label: 'New Pull', style: buttonStyle }),
 	        _react2.default.createElement(_FlatButton2.default, { label: 'My Pull', style: buttonStyle }),
-	        _react2.default.createElement(_FlatButton2.default, { label: 'Logout', style: buttonStyle })
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/logout' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Logout', style: buttonStyle })
+	        )
 	      );
 	    }
 
@@ -53710,11 +53721,11 @@
 
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
-	      api: 'signup',
+	      api: 'signup:req',
 	      data: Object.assign({}, this.state, { $user: this.props.state.user })
 	    });
 
-	    this.props.state.io.on('signup', function (data) {
+	    this.props.state.io.on('signup:res', function (data) {
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
 	      } else if (data.error === null) {
@@ -53729,7 +53740,7 @@
 	        }), _defineProperty(_this2$setState, 'button_disabled', true), _this2$setState));
 	      }
 
-	      _this2.props.state.io.removeListener('signup');
+	      _this2.props.state.io.removeListener('signup:res');
 	    });
 	  }
 	});
@@ -58519,11 +58530,11 @@
 
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
-	      api: 'login',
+	      api: 'login:req',
 	      data: Object.assign({}, this.state, { $user: this.props.state.user })
 	    });
 
-	    this.props.state.io.on('login', function (data) {
+	    this.props.state.io.on('login:res', function (data) {
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
 	      } else if (data.error === null) {
@@ -58533,13 +58544,77 @@
 	        });
 	      } else _this2.setState({ error: data.error });
 
-	      _this2.props.state.io.removeListener('login');
+	      _this2.props.state.io.removeListener('login:res');
 	    });
 	  }
 	});
 
 /***/ },
 /* 586 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Paper = __webpack_require__(437);
+
+	var _Paper2 = _interopRequireDefault(_Paper);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'LogoutPage',
+	  getInitialState: function getInitialState() {
+	    return { message: 'Logout..' };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+
+	    if (typeof this.props.state == 'undefined' || !this.props.state.user) return;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'logout:req',
+	      data: { $user: this.props.state.user }
+	    });
+
+	    this.props.state.io.on('logout:res', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        _this.props.dispatch({
+	          type: 'SET_USER',
+	          data: null
+	        });
+
+	        _this.setState({ message: 'Account disconnected! See you later!' });
+	      } else _this.setState({ message: data.error });
+
+	      _this.props.state.io.removeListener('logout:res');
+	    });
+	  },
+	  render: function render() {
+	    return _react2.default.createElement(
+	      _Paper2.default,
+	      { style: { padding: '8px', margin: '8px' } },
+	      _react2.default.createElement(
+	        'h4',
+	        { className: 'text-center' },
+	        this.state.message
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 587 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

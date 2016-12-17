@@ -1,5 +1,18 @@
+import { MongoClient } from 'mongodb';
+
 import signup_handle from './socket_handles/signup';
 import login_handle from './socket_handles/login';
+import logout_handle from './socket_handles/logout';
+
+const socket_handle = (io) => {
+  io.on ('connection', (socket) => {
+    socket.on ('signup:req', (data) => signup_handle (socket, data));
+    socket.on ('login:req', (data) => login_handle (socket, data));
+    socket.on ('logout:req', (data) => logout_handle (socket, data));
+  });
+
+  /* TODO: on disconnect can be handled? */
+};
 
 export const emitObj = (socket, type, object, log = null) => {
   if ( log ) log (JSON.stringify (object));
@@ -17,13 +30,26 @@ export const emitObj = (socket, type, object, log = null) => {
   return true;
 };
 
-const socket_handle = (io) => {
-  io.on ('connection', (socket) => {
-    socket.on ('signup', (data) => signup_handle (socket, data));
-    socket.on ('login', (data) => login_handle (socket, data));
-  });
+export const authUser = (user_info, callback) => {
+  if ( !user_info )
+    return callback (null, false);
 
-  /* TODO: on disconnect can be handled? */
+  if ( process.env.MONGOURI == 'undefined' )
+    return callback ('Environment variable MONGOURI not found', false);
+
+  MongoClient.connect (process.env.MONGOURI, (err, db) => {
+    if (err)
+      return callback ('MongoDB connect failed. Description: ' + err.message, false);
+
+    db.collection ('vote_users').findOne ({ session: user_info.session }, (err, doc) => {
+      db.close ();
+
+      if (err)
+        return callback ('MongoDB findOne failed. Description: ' + err.message, false);
+
+      return callback (null, doc ? true : false);
+    });
+  });
 };
 
 export default socket_handle;

@@ -49,11 +49,11 @@ export default React.createClass ({
   login () {
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
-      api: 'login',
+      api: 'login:req',
       data: Object.assign ({}, this.state, { $user: this.props.state.user })
     });
 
-    this.props.state.io.on ('login', (data) => {
+    this.props.state.io.on ('login:res', (data) => {
       if ( 'server_error' in data ) {
         console.warn (data.server_error);
       }
@@ -65,7 +65,7 @@ export default React.createClass ({
       }
       else this.setState ({ error: data.error });
 
-      this.props.state.io.removeListener ('login');
+      this.props.state.io.removeListener ('login:res');
     });
   }
 });
