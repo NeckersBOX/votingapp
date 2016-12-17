@@ -37475,7 +37475,8 @@
 
 	  var callbacks = {
 	    'SET_SOCKET_IO': setSocketIO,
-	    'EMIT_SOCKET_IO': emitSocketIO
+	    'EMIT_SOCKET_IO': emitSocketIO,
+	    'SET_USER': setUser
 	  };
 
 	  return callbacks[action.type](state, action);
@@ -37493,6 +37494,10 @@
 
 	  state.io.emit(action.api, action.data);
 	  return state;
+	};
+
+	var setUser = function setUser(state, action) {
+	  return Object.assign({}, state, { user: action.data });
 	};
 
 	exports.default = voteReducer;
@@ -42823,28 +42828,46 @@
 	      color: 'white'
 	    };
 
+	    var AppBarMenu = null;
+	    if (typeof this.props.state == 'undefined' || !this.props.state.user) {
+	      AppBarMenu = _react2.default.createElement(
+	        'div',
+	        { className: 'appbar-btn' },
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle })
+	        ),
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/signup' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Sign Up', style: buttonStyle })
+	        ),
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/login' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle })
+	        )
+	      );
+	    } else {
+	      AppBarMenu = _react2.default.createElement(
+	        'div',
+	        { className: 'appbar-btn' },
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle })
+	        ),
+	        _react2.default.createElement(_FlatButton2.default, { label: 'New Pull', style: buttonStyle }),
+	        _react2.default.createElement(_FlatButton2.default, { label: 'My Pull', style: buttonStyle }),
+	        _react2.default.createElement(_FlatButton2.default, { label: 'Logout', style: buttonStyle })
+	      );
+	    }
+
 	    return _react2.default.createElement(
 	      'div',
 	      null,
-	      _react2.default.createElement(_AppBar2.default, { title: 'Vote!', showMenuIconButton: false, iconElementRight: _react2.default.createElement(
-	          'div',
-	          { className: 'appbar-btn' },
-	          _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: '/' },
-	            _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle })
-	          ),
-	          _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: '/signup' },
-	            _react2.default.createElement(_FlatButton2.default, { label: 'Sign Up', style: buttonStyle })
-	          ),
-	          _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: '/login' },
-	            _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle })
-	          )
-	        ) }),
+	      _react2.default.createElement(_AppBar2.default, { title: 'Vote!', showMenuIconButton: false, iconElementRight: AppBarMenu }),
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'main' },
@@ -53601,7 +53624,7 @@
 	    });
 	  },
 	  changeName: function changeName(e) {
-	    if (e.target.value.length < 6) {
+	    if (e.target.value.trim().length < 6) {
 	      this.setState({
 	        name: {
 	          text: e.target.value,
@@ -53688,7 +53711,7 @@
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
 	      api: 'signup',
-	      data: this.state
+	      data: Object.assign({}, this.state, { $user: this.props.state.user })
 	    });
 
 	    this.props.state.io.on('signup', function (data) {
@@ -58419,10 +58442,28 @@
 	exports.default = _react2.default.createClass({
 	  displayName: 'LoginPage',
 	  getInitialState: function getInitialState() {
-	    return { name: '', pass: '' };
+	    return { name: '', pass: '', error: null };
 	  },
 	  render: function render() {
 	    var _this = this;
+
+	    if (typeof this.props.state != 'undefined' && this.props.state.user) {
+	      return _react2.default.createElement(
+	        _Paper2.default,
+	        { style: { margin: '8px', padding: '8px' } },
+	        _react2.default.createElement(
+	          'h1',
+	          { className: 'text-center' },
+	          'Welcome back ',
+	          _react2.default.createElement(
+	            'em',
+	            null,
+	            this.props.state.user.name
+	          ),
+	          ' !'
+	        )
+	      );
+	    }
 
 	    return _react2.default.createElement(
 	      _Paper2.default,
@@ -58442,6 +58483,11 @@
 	          'Sign Up'
 	        )
 	      ),
+	      this.state.error ? _react2.default.createElement(
+	        'p',
+	        { className: 'text-center text-error' },
+	        this.state.error
+	      ) : '',
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
@@ -58474,17 +58520,18 @@
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
 	      api: 'login',
-	      data: this.state
+	      data: Object.assign({}, this.state, { $user: this.props.state.user })
 	    });
 
 	    this.props.state.io.on('login', function (data) {
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
 	      } else if (data.error === null) {
-	        console.log('Login!');
-	      } else {
-	        console.log(data.error);
-	      }
+	        _this2.props.dispatch({
+	          type: 'SET_USER',
+	          data: data
+	        });
+	      } else _this2.setState({ error: data.error });
 
 	      _this2.props.state.io.removeListener('login');
 	    });

@@ -5,6 +5,11 @@ import { emitObj } from '../socket_handle';
 const signup_handle = (socket, data) => {
   let username = data.name.text.toLowerCase ();
 
+  if ( data['$user'] )
+    return emitObj (socket, 'signup', {
+      error: 'User already logged', field: 'name'
+    });
+
   if ( typeof process.env.MONGOURI == 'undefined' )
     return emitObj (socket, 'signup', {
       server_error: 'Environment variable MONGOURI not found'
@@ -25,7 +30,7 @@ const signup_handle = (socket, data) => {
         $close_db: db
       });
 
-    if ( data.name.text.length < 6 )
+    if ( data.name.text.trim ().length < 6 )
       return emitObj (socket, 'signup', {
         error: 'Minimum length 6 characters.', field: 'name',
         $close_db: db
@@ -73,7 +78,7 @@ const signup_handle = (socket, data) => {
         hash: md5 (username + ':' + data.password.text),
         time_signup: currTime,
         time_login: currTime,
-        logged: false
+        session: ''
       }, (err, r) => {
         if (err)
           return emitObj (socket, 'signup', {

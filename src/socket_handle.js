@@ -20,7 +20,6 @@ export const emitObj = (socket, type, object, log = null) => {
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
     /* TODO: check if request is from logged user */
-
     socket.on ('signup', (data) => signup_handle (socket, data));
     socket.on ('login', (data) => login_handle (socket, data));
   });

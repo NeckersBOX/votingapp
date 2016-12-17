@@ -10,7 +10,8 @@ const voteReducer = (state, action) => {
 
   const callbacks = {
     'SET_SOCKET_IO': setSocketIO,
-    'EMIT_SOCKET_IO': emitSocketIO
+    'EMIT_SOCKET_IO': emitSocketIO,
+    'SET_USER': setUser
   };
 
   return callbacks[action.type] (state, action)
@@ -27,5 +28,7 @@ const emitSocketIO = (state, action) => {
   state.io.emit (action.api, action.data);
   return state;
 };
+
+const setUser = (state, action) => Object.assign ({}, state, { user: action.data });
 
 export default voteReducer;

@@ -6,9 +6,17 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 export default React.createClass ({
   getInitialState () {
-    return { name: '', pass: '' };
+    return { name: '', pass: '', error: null };
   },
   render () {
+    if ( typeof this.props.state != 'undefined' && this.props.state.user  ) {
+      return (
+        <Paper style={{ margin: '8px', padding: '8px' }}>
+          <h1 className="text-center">Welcome back <em>{this.props.state.user.name}</em> !</h1>
+        </Paper>
+      );
+    }
+
     return (
       <Paper style={{ margin: '8px', padding: '8px' }}>
         <h1 className="text-center">Login</h1>
@@ -18,6 +26,8 @@ export default React.createClass ({
             Sign Up
           </Link>
         </p>
+
+        {this.state.error ? <p className="text-center text-error">{this.state.error}</p> : ''}
 
         <div className="align-center">
           <TextField hintText="Username" id="username" name="username" type="text"
@@ -40,7 +50,7 @@ export default React.createClass ({
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
       api: 'login',
-      data: this.state
+      data: Object.assign ({}, this.state, { $user: this.props.state.user })
     });
 
     this.props.state.io.on ('login', (data) => {
@@ -48,11 +58,12 @@ export default React.createClass ({
         console.warn (data.server_error);
       }
       else if ( data.error === null ) {
-        console.log ('Login!');
+        this.props.dispatch ({
+          type: 'SET_USER',
+          data: data
+        });
       }
-      else {
-        console.log (data.error);
-      }
+      else this.setState ({ error: data.error });
 
       this.props.state.io.removeListener ('login');
     });

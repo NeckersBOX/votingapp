@@ -120,7 +120,7 @@ export default React.createClass ({
     });
   },
   changeName (e) {
-    if ( e.target.value.length < 6 ) {
+    if ( e.target.value.trim ().length < 6 ) {
       this.setState ({
         name: {
           text: e.target.value,
@@ -206,7 +206,7 @@ export default React.createClass ({
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
       api: 'signup',
-      data: this.state
+      data: Object.assign ({}, this.state, { $user: this.props.state.user })
     });
 
     this.props.state.io.on ('signup', (data) => {

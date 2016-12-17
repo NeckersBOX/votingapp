@@ -16,21 +16,40 @@ export default React.createClass ({
       color: 'white'
     };
 
+    /* TODO: Add class hide-sm ( and hide-md, hide-lg? ) and show-* in the same way. */
+    
+    let AppBarMenu = null;
+    if ( typeof this.props.state == 'undefined' || !this.props.state.user  ) {
+      AppBarMenu = (
+        <div className="appbar-btn">
+          <Link to="/">
+            <FlatButton label="Home" style={buttonStyle} />
+          </Link>
+          <Link to="/signup">
+            <FlatButton label="Sign Up" style={buttonStyle} />
+          </Link>
+          <Link to="/login">
+            <FlatButton label="Login" style={buttonStyle} />
+          </Link>
+        </div>
+      );
+    }
+    else {
+      AppBarMenu = (
+        <div className="appbar-btn">
+          <Link to="/">
+            <FlatButton label="Home" style={buttonStyle} />
+          </Link>
+          <FlatButton label="New Pull" style={buttonStyle} />
+          <FlatButton label="My Pull" style={buttonStyle} />
+          <FlatButton label="Logout" style={buttonStyle} />
+        </div>
+      );
+    }
+
     return (
       <div>
-        <AppBar title="Vote!" showMenuIconButton={false} iconElementRight={
-          <div className="appbar-btn">
-            <Link to="/">
-              <FlatButton label="Home" style={buttonStyle} />
-            </Link>
-            <Link to="/signup">
-              <FlatButton label="Sign Up" style={buttonStyle} />
-            </Link>
-            <Link to="/login">
-              <FlatButton label="Login" style={buttonStyle} />
-            </Link>
-          </div>
-        }>
+        <AppBar title="Vote!" showMenuIconButton={false} iconElementRight={AppBarMenu}>
         </AppBar>
 
         <div className="main">

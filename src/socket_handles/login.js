@@ -5,37 +5,58 @@ import { emitObj } from '../socket_handle';
 const login_handle = (socket, data) => {
   let username = data.name.toLowerCase ();
 
+  if ( data['$user'] )
+    return emitObj (socket, 'login', { error: 'User already logged.' });
+
   if ( typeof process.env.MONGOURI == 'undefined' )
     return emitObj (socket, 'login', {
       server_error: 'Environment variable MONGOURI not found'
     }, console.error);
 
-    MongoClient.connect (process.env.MONGOURI, (err, db) => {
-      if ( err )
+  MongoClient.connect (process.env.MONGOURI, (err, db) => {
+    if ( err )
+      return emitObj (socket, 'login', {
+        server_error: 'MongoDB connect failed. Description: ' + err.message
+      }, console.warn);
+      let collection = db.collection ('vote_users');
+
+    collection.findOne ({
+      hash: md5 (username + ':' + data.pass)
+    }, (err, doc) => {
+      if (err)
         return emitObj (socket, 'login', {
-          server_error: 'MongoDB connect failed. Description: ' + err.message
+          server_error: 'MongoDB findOne error. Description: ' + err.message,
+          $close_db: db
         }, console.warn);
 
-      db.collection ('vote_users').findOne ({
-        hash: md5 (username + ':' + data.pass)
-      }, (err, doc) => {
-        if (err)
-          return emitObj (socket, 'login', {
-            server_error: 'MongoDB findOne error. Description: ' + err.message,
-            $close_db: db
-          }, console.warn);
+      if ( !doc )
+        return emitObj (socket, 'login', {
+          error: 'Username or password invalid.',
+          $close_db: db
+        });
 
-        if ( !doc )
+      let currDate = new Date ().getTime ();
+      let session_id = md5 (currDate + '$' + md5 (username + ':' + data.pass));
+
+      collection.findOneAndUpdate ({ hash: doc.hash }, Object.assign ({}, doc, {
+        session: session_id,
+        time_login: Math.floor (currDate / 1000)
+      }), (err, r) => {
+        if (err) {
           return emitObj (socket, 'login', {
-            error: 'Username or password invalid.',
+            server_error: 'MongoDB findOneAndModify error. Description: ' + err.message,
             $close_db: db
           });
+        }
 
-        /* TODO: init session / update login\logged in database ( findOne -> findAndModify? ) */
-
-        emitObj (socket, 'login', { error: null, $close_db: db });
+        emitObj (socket, 'login', { error: null,
+          name: doc.name,
+          session: session_id,
+          $close_db: db
+        });
       });
     });
+  });
 };
 
 export default login_handle;
