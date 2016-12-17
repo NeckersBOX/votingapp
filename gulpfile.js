@@ -1,8 +1,10 @@
 'use strict';
 
 const gulp = require ('gulp');
+const minify = require ('gulp-minify');
 const sass = require ('gulp-sass');
-const webpack = require ('webpack-stream');
+const webpack = require ('webpack');
+const webpackStream = require ('webpack-stream');
 const del = require ('del');
 const exec = require('child_process').exec;
 const runSequence = require ('run-sequence');
@@ -20,7 +22,7 @@ gulp.task ('sass', () => gulp.src (files.sass)
 
 gulp.task ('webpack', (cb) =>
   gulp.src ('src/app-client.js')
-    .pipe (webpack ({
+    .pipe (webpackStream ({
       output: {
         filename: 'bundle.js'
       },
@@ -32,8 +34,16 @@ gulp.task ('webpack', (cb) =>
             presets: ['react', 'es2015']
           }
         }]
-      }
+      },
+      plugins: [
+        new webpack.DefinePlugin ({
+          'process.env': {
+            NODE_ENV: process.env.NODE_ENV || '"production"'
+          }
+        })
+      ],
     }))
+    .pipe(minify())
     .pipe (gulp.dest ('dist/js'))
 );
 
