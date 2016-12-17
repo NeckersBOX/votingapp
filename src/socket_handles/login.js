@@ -14,7 +14,7 @@ const login_handle = (socket, data) => {
       if ( err )
         return emitObj (socket, 'login', {
           server_error: 'MongoDB connect failed. Description: ' + err.message
-        }, console.warn)
+        }, console.warn);
 
       db.collection ('vote_users').findOne ({
         hash: md5 (username + ':' + data.pass)
