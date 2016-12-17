@@ -26,7 +26,9 @@ export default React.createClass ({
             <Link to="/signup">
               <FlatButton label="Sign Up" style={buttonStyle} />
             </Link>
-            <FlatButton label="Login" style={buttonStyle} />
+            <Link to="/login">
+              <FlatButton label="Login" style={buttonStyle} />
+            </Link>
           </div>
         }>
         </AppBar>

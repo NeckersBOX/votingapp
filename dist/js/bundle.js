@@ -37525,7 +37525,11 @@
 
 	var _SignUpPage2 = _interopRequireDefault(_SignUpPage);
 
-	var _NotFoundPage = __webpack_require__(585);
+	var _LoginPage = __webpack_require__(585);
+
+	var _LoginPage2 = _interopRequireDefault(_LoginPage);
+
+	var _NotFoundPage = __webpack_require__(586);
 
 	var _NotFoundPage2 = _interopRequireDefault(_NotFoundPage);
 
@@ -37536,6 +37540,7 @@
 	  { path: '/', component: _Layout2.default },
 	  _react2.default.createElement(_reactRouter.IndexRoute, { component: _IndexPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'signup', component: _SignUpPage2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'login', component: _LoginPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundPage2.default })
 	);
 
@@ -42834,7 +42839,11 @@
 	            { to: '/signup' },
 	            _react2.default.createElement(_FlatButton2.default, { label: 'Sign Up', style: buttonStyle })
 	          ),
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle })
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/login' },
+	            _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle })
+	          )
 	        ) }),
 	      _react2.default.createElement(
 	        'div',
@@ -53456,7 +53465,7 @@
 	        { selectable: false },
 	        _react2.default.createElement(
 	          _Table.TableHeader,
-	          null,
+	          { displaySelectAll: false, adjustForCheckbox: false },
 	          _react2.default.createElement(
 	            _Table.TableRow,
 	            null,
@@ -53474,7 +53483,7 @@
 	        ),
 	        _react2.default.createElement(
 	          _Table.TableBody,
-	          null,
+	          { displayRowCheckbox: false },
 	          _react2.default.createElement(
 	            _Table.TableRow,
 	            null,
@@ -58379,7 +58388,7 @@
 /* 585 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -58389,18 +58398,129 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(227);
+
+	var _Paper = __webpack_require__(437);
+
+	var _Paper2 = _interopRequireDefault(_Paper);
+
+	var _TextField = __webpack_require__(555);
+
+	var _TextField2 = _interopRequireDefault(_TextField);
+
+	var _RaisedButton = __webpack_require__(448);
+
+	var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'LoginPage',
+	  getInitialState: function getInitialState() {
+	    return { name: '', pass: '' };
+	  },
+	  render: function render() {
+	    var _this = this;
+
+	    return _react2.default.createElement(
+	      _Paper2.default,
+	      { style: { margin: '8px', padding: '8px' } },
+	      _react2.default.createElement(
+	        'h1',
+	        { className: 'text-center' },
+	        'Login'
+	      ),
+	      _react2.default.createElement(
+	        'p',
+	        { className: 'text-center' },
+	        'Not register yet?',
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/signup' },
+	          'Sign Up'
+	        )
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'align-center' },
+	        _react2.default.createElement(_TextField2.default, { hintText: 'Username or Email', id: 'username', name: 'username', type: 'text',
+	          value: this.state.name, onChange: function onChange(e) {
+	            return _this.handleChange('name', e);
+	          } })
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'align-center' },
+	        _react2.default.createElement(_TextField2.default, { hintText: 'Password', id: 'password', name: 'password', type: 'password',
+	          value: this.state.pass, onChange: function onChange(e) {
+	            return _this.handleChange('pass', e);
+	          } })
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'align-center' },
+	        _react2.default.createElement(_RaisedButton2.default, { primary: true, onClick: this.login, label: 'Login' })
+	      )
+	    );
+	  },
+	  handleChange: function handleChange(type, e) {
+	    this.setState(_defineProperty({}, type, e.target.value));
+	  },
+	  login: function login() {
+	    var _this2 = this;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'login',
+	      data: this.state
+	    });
+
+	    this.props.state.io.on('login', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        console.log('Login!');
+	      } else {
+	        console.log(data.error);
+	      }
+
+	      _this2.props.state.io.removeListener('login');
+	    });
+	  }
+	});
+
+/***/ },
+/* 586 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Paper = __webpack_require__(437);
+
+	var _Paper2 = _interopRequireDefault(_Paper);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
-	  displayName: "NotFoundPage",
+	  displayName: 'NotFoundPage',
 	  render: function render() {
 	    return _react2.default.createElement(
-	      "div",
-	      { className: "col-sm-12" },
+	      _Paper2.default,
+	      { style: { padding: '8px', margin: '8px' } },
 	      _react2.default.createElement(
-	        "h2",
-	        null,
-	        "Not Found Page"
+	        'h1',
+	        { className: 'text-center' },
+	        'Page Not Found :('
 	      )
 	    );
 	  }

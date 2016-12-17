@@ -1,11 +1,12 @@
 import React from 'react';
+import Paper from 'material-ui/Paper';
 
 export default React.createClass ({
   render () {
     return (
-      <div className="col-sm-12">
-        <h2>Not Found Page</h2>
-      </div>
+      <Paper style={{ padding: '8px', margin: '8px' }}>
+        <h1 className="text-center">Page Not Found :(</h1>
+      </Paper>
     );
   }
 });

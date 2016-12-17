@@ -5,7 +5,7 @@
 
 ## Free Code Camp Challenge
 
-This app was built in MERN stack. It uses: MongoDB, Node, Express, React, React Router, Redux and Material-UI.
+This app was built in MERN stack. It uses: MongoDB, Node, Express, React, React Router, Redux, Socket.IO and Material-UI.
 
 _Note_: Server and client components are _isomorphic_.
 
