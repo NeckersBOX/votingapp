@@ -58445,7 +58445,7 @@
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
-	        _react2.default.createElement(_TextField2.default, { hintText: 'Username or Email', id: 'username', name: 'username', type: 'text',
+	        _react2.default.createElement(_TextField2.default, { hintText: 'Username', id: 'username', name: 'username', type: 'text',
 	          value: this.state.name, onChange: function onChange(e) {
 	            return _this.handleChange('name', e);
 	          } })

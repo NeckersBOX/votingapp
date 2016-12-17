@@ -20,7 +20,7 @@ export default React.createClass ({
         </p>
 
         <div className="align-center">
-          <TextField hintText="Username or Email" id="username" name="username" type="text"
+          <TextField hintText="Username" id="username" name="username" type="text"
             value={this.state.name} onChange={(e) => this.handleChange ('name', e)} />
         </div>
         <div className="align-center">
