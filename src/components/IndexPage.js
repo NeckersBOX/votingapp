@@ -20,13 +20,13 @@ export default React.createClass ({
 
         <Tabs className="no-main">
           <Tab label="Trending" icon={<FontIcon className="material-icons">trending_up</FontIcon>}>
-            <h3>Top trending Pulls</h3>
+            <h3>Top trending Polls</h3>
           </Tab>
           <Tab label="Popular" icon={<FontIcon className="material-icons">terrain</FontIcon>}>
-            <h3>Popular Pulls</h3>
+            <h3>Popular Polls</h3>
           </Tab>
           <Tab label="Latest" icon={<FontIcon className="material-icons">format_indent_increase</FontIcon>}>
-            <h3>Latest Pulls</h3>
+            <h3>Latest Polls</h3>
           </Tab>
         </Tabs>
       </div>

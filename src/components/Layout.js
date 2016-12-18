@@ -1,5 +1,6 @@
 import React from 'react';
 import AppBar from 'material-ui/AppBar';
+import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import { Link } from 'react-router';
 import io from 'socket.io-client';
@@ -23,13 +24,19 @@ export default React.createClass ({
       AppBarMenu = (
         <div className="appbar-btn">
           <Link to="/">
-            <FlatButton label="Home" style={buttonStyle} />
+            <FlatButton label="Home" style={buttonStyle} icon={
+              <FontIcon className="material-icons">home</FontIcon>
+            }/>
           </Link>
           <Link to="/signup">
-            <FlatButton label="Sign Up" style={buttonStyle} />
+            <FlatButton label="Sign Up" style={buttonStyle} icon={
+              <FontIcon className="material-icons">person_add</FontIcon>
+            }/>
           </Link>
           <Link to="/login">
-            <FlatButton label="Login" style={buttonStyle} />
+            <FlatButton label="Login" style={buttonStyle} icon={
+              <FontIcon className="material-icons">account_circle</FontIcon>
+            }/>
           </Link>
         </div>
       );
@@ -38,12 +45,20 @@ export default React.createClass ({
       AppBarMenu = (
         <div className="appbar-btn">
           <Link to="/">
-            <FlatButton label="Home" style={buttonStyle} />
+            <FlatButton label="Home" style={buttonStyle} icon={
+              <FontIcon className="material-icons">home</FontIcon>
+            }/>
           </Link>
-          <FlatButton label="New Pull" style={buttonStyle} />
-          <FlatButton label="My Pull" style={buttonStyle} />
+          <FlatButton label="New Pull" style={buttonStyle} icon={
+            <FontIcon className="material-icons">playlist_add</FontIcon>
+          }/>
+          <FlatButton label="My Pull" style={buttonStyle} icon={
+            <FontIcon className="material-icons">account_circle</FontIcon>
+          }/>
           <Link to="/logout">
-            <FlatButton label="Logout" style={buttonStyle} />
+            <FlatButton label="Logout" style={buttonStyle} icon={
+              <FontIcon className="material-icons">directions_run</FontIcon>
+            }/>
           </Link>
         </div>
       );

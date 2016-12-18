@@ -36298,7 +36298,7 @@
 	          _react2.default.createElement(
 	            'h3',
 	            null,
-	            'Top trending Pulls'
+	            'Top trending Polls'
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -36311,7 +36311,7 @@
 	          _react2.default.createElement(
 	            'h3',
 	            null,
-	            'Popular Pulls'
+	            'Popular Polls'
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -36324,7 +36324,7 @@
 	          _react2.default.createElement(
 	            'h3',
 	            null,
-	            'Latest Pulls'
+	            'Latest Polls'
 	          )
 	        )
 	      )
@@ -40386,6 +40386,10 @@
 
 	var _AppBar2 = _interopRequireDefault(_AppBar);
 
+	var _FontIcon = __webpack_require__(463);
+
+	var _FontIcon2 = _interopRequireDefault(_FontIcon);
+
 	var _FlatButton = __webpack_require__(481);
 
 	var _FlatButton2 = _interopRequireDefault(_FlatButton);
@@ -40421,17 +40425,29 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle })
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'home'
+	            ) })
 	        ),
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/signup' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Sign Up', style: buttonStyle })
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Sign Up', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'person_add'
+	            ) })
 	        ),
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/login' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle })
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'account_circle'
+	            ) })
 	        )
 	      );
 	    } else {
@@ -40441,14 +40457,30 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle })
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'home'
+	            ) })
 	        ),
-	        _react2.default.createElement(_FlatButton2.default, { label: 'New Pull', style: buttonStyle }),
-	        _react2.default.createElement(_FlatButton2.default, { label: 'My Pull', style: buttonStyle }),
+	        _react2.default.createElement(_FlatButton2.default, { label: 'New Pull', style: buttonStyle, icon: _react2.default.createElement(
+	            _FontIcon2.default,
+	            { className: 'material-icons' },
+	            'playlist_add'
+	          ) }),
+	        _react2.default.createElement(_FlatButton2.default, { label: 'My Pull', style: buttonStyle, icon: _react2.default.createElement(
+	            _FontIcon2.default,
+	            { className: 'material-icons' },
+	            'account_circle'
+	          ) }),
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/logout' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Logout', style: buttonStyle })
+	          _react2.default.createElement(_FlatButton2.default, { label: 'Logout', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'directions_run'
+	            ) })
 	        )
 	      );
 	    }
