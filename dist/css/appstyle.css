@@ -1,6 +1,7 @@
 body {
   margin: 0;
-  font-family: 'Roboto', sans-serif; }
+  font-family: 'Roboto', sans-serif;
+  color: rgba 0, 0, 0, 0.89; }
 
 h1, h2, h3, h4, h5, h6 {
   color: #00bcd4;
@@ -28,6 +29,12 @@ a {
 
 .text-error {
   color: #ff2200; }
+
+.text-primary {
+  color: #00bcd4; }
+
+.text-small {
+  font-size: 0.8em; }
 
 .align-center {
   display: block;
