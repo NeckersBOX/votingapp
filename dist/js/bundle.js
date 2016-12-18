@@ -36214,6 +36214,10 @@
 
 	var _NotFoundPage2 = _interopRequireDefault(_NotFoundPage);
 
+	var _AddPollPage = __webpack_require__(571);
+
+	var _AddPollPage2 = _interopRequireDefault(_AddPollPage);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var routes = _react2.default.createElement(
@@ -36223,6 +36227,7 @@
 	  _react2.default.createElement(_reactRouter.Route, { path: 'signup', component: _SignUpPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'login', component: _LoginPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'logout', component: _LogoutPage2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'add-poll', component: _AddPollPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundPage2.default })
 	);
 
@@ -36279,11 +36284,11 @@
 	          { className: 'text-center' },
 	          'Create custom polls with live results.'
 	        ),
-	        _react2.default.createElement(
+	        typeof this.props.state == 'undefined' || !this.props.state.user ? _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/signup' },
 	          _react2.default.createElement(_RaisedButton2.default, { fullWidth: true, primary: true, label: 'Sign Up Now' })
-	        )
+	        ) : ''
 	      ),
 	      _react2.default.createElement(
 	        _Tabs.Tabs,
@@ -40415,8 +40420,6 @@
 	      color: 'white'
 	    };
 
-	    /* TODO: Add class hide-sm ( and hide-md, hide-lg? ) and show-* in the same way. */
-
 	    var AppBarMenu = null;
 	    if (typeof this.props.state == 'undefined' || !this.props.state.user) {
 	      AppBarMenu = _react2.default.createElement(
@@ -40463,12 +40466,16 @@
 	              'home'
 	            ) })
 	        ),
-	        _react2.default.createElement(_FlatButton2.default, { label: 'New Pull', style: buttonStyle, icon: _react2.default.createElement(
-	            _FontIcon2.default,
-	            { className: 'material-icons' },
-	            'playlist_add'
-	          ) }),
-	        _react2.default.createElement(_FlatButton2.default, { label: 'My Pull', style: buttonStyle, icon: _react2.default.createElement(
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/add-poll' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'New Poll', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'playlist_add'
+	            ) })
+	        ),
+	        _react2.default.createElement(_FlatButton2.default, { label: 'My Poll', style: buttonStyle, icon: _react2.default.createElement(
 	            _FontIcon2.default,
 	            { className: 'material-icons' },
 	            'account_circle'
@@ -56033,7 +56040,7 @@
 	        'Not register yet?',
 	        _react2.default.createElement(
 	          _reactRouter.Link,
-	          { to: '/signup' },
+	          { to: '/signup', className: 'margin-horizontal' },
 	          'Sign Up'
 	        )
 	      ),
@@ -56186,6 +56193,1550 @@
 	        'h1',
 	        { className: 'text-center' },
 	        'Page Not Found :('
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 571 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Stepper = __webpack_require__(572);
+
+	var _RaisedButton = __webpack_require__(436);
+
+	var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
+
+	var _NoAuth = __webpack_require__(582);
+
+	var _NoAuth2 = _interopRequireDefault(_NoAuth);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	var QuestionStep = _react2.default.createClass({
+	  displayName: 'QuestionStep',
+	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+
+	    setTimeout(function () {
+	      return _this.props.completed({ status: true, type: 'name', value: 'neckers' });
+	    }, 3000);
+	  },
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'p',
+	      null,
+	      'Question Step'
+	    );
+	  }
+	});
+
+	var OptionsStep = _react2.default.createClass({
+	  displayName: 'OptionsStep',
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'p',
+	      null,
+	      'Options Step'
+	    );
+	  }
+	});
+
+	var PublishStep = _react2.default.createClass({
+	  displayName: 'PublishStep',
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'p',
+	      null,
+	      'Publish Step'
+	    );
+	  }
+	});
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'AddPollPage',
+	  getInitialState: function getInitialState() {
+	    return {
+	      completed: false,
+	      step: 0,
+	      poll: {
+	        name: '',
+	        options: []
+	      }
+	    };
+	  },
+	  render: function render() {
+	    var _this2 = this;
+
+	    if (typeof this.props.state == 'undefined' || !this.props.state.user) return _react2.default.createElement(_NoAuth2.default, null);
+
+	    var stepContent = _react2.default.createElement(
+	      'p',
+	      { className: 'text-error' },
+	      'Invalid Step'
+	    );
+	    switch (this.state.step) {
+	      case 0:
+	        stepContent = _react2.default.createElement(QuestionStep, { poll: this.state.poll, completed: this.stepCompleted });
+	        break;
+	      case 1:
+	        stepContent = _react2.default.createElement(OptionsStep, { poll: this.state.poll, completed: this.stepCompleted });
+	        break;
+	      case 2:
+	        stepContent = _react2.default.createElement(PublishStep, { poll: this.state.poll });
+	        break;
+	    }
+
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h1',
+	        { className: 'text-center' },
+	        'Add a new poll'
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'align-center' },
+	        _react2.default.createElement(
+	          _Stepper.Stepper,
+	          { activeStep: this.state.step },
+	          _react2.default.createElement(
+	            _Stepper.Step,
+	            null,
+	            _react2.default.createElement(
+	              _Stepper.StepLabel,
+	              null,
+	              'Question'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            _Stepper.Step,
+	            null,
+	            _react2.default.createElement(
+	              _Stepper.StepLabel,
+	              null,
+	              'Options'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            _Stepper.Step,
+	            null,
+	            _react2.default.createElement(
+	              _Stepper.StepLabel,
+	              null,
+	              'Publish'
+	            )
+	          )
+	        ),
+	        stepContent,
+	        this.state.step > 0 ? _react2.default.createElement(_RaisedButton2.default, { style: { float: 'left' }, primary: true, label: 'Previous Step', onClick: function onClick() {
+	            return _this2.setState({ step: _this2.state.step - 1 });
+	          } }) : '',
+	        this.state.step < 2 ? _react2.default.createElement(_RaisedButton2.default, { style: { float: 'right' }, primary: true, label: 'Next Step', onClick: function onClick() {
+	            return _this2.setState({ step: _this2.state.step + 1 });
+	          }, disabled: !this.state.completed }) : _react2.default.createElement(_RaisedButton2.default, { style: { float: 'right' }, primary: true, label: 'Publish', onClick: this.publishPoll })
+	      )
+	    );
+	  },
+	  stepCompleted: function stepCompleted(data) {
+	    this.setState({
+	      completed: data.status,
+	      poll: Object.assign({}, this.state.poll, _defineProperty({}, data.type, data.value))
+	    });
+	  },
+	  publishPoll: function publishPoll() {
+	    console.log(this.state.poll);
+	  }
+	});
+
+/***/ },
+/* 572 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Stepper = exports.StepLabel = exports.StepContent = exports.StepButton = exports.Step = undefined;
+
+	var _Step2 = __webpack_require__(573);
+
+	var _Step3 = _interopRequireDefault(_Step2);
+
+	var _StepButton2 = __webpack_require__(574);
+
+	var _StepButton3 = _interopRequireDefault(_StepButton2);
+
+	var _StepContent2 = __webpack_require__(577);
+
+	var _StepContent3 = _interopRequireDefault(_StepContent2);
+
+	var _StepLabel2 = __webpack_require__(575);
+
+	var _StepLabel3 = _interopRequireDefault(_StepLabel2);
+
+	var _Stepper2 = __webpack_require__(580);
+
+	var _Stepper3 = _interopRequireDefault(_Stepper2);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	exports.Step = _Step3.default;
+	exports.StepButton = _StepButton3.default;
+	exports.StepContent = _StepContent3.default;
+	exports.StepLabel = _StepLabel3.default;
+	exports.Stepper = _Stepper3.default;
+
+/***/ },
+/* 573 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var getStyles = function getStyles(_ref, _ref2) {
+	  var index = _ref.index;
+	  var stepper = _ref2.stepper;
+	  var orientation = stepper.orientation;
+
+	  var styles = {
+	    root: {
+	      flex: '0 0 auto'
+	    }
+	  };
+
+	  if (index > 0) {
+	    if (orientation === 'horizontal') {
+	      styles.root.marginLeft = -6;
+	    } else if (orientation === 'vertical') {
+	      styles.root.marginTop = -14;
+	    }
+	  }
+
+	  return styles;
+	};
+
+	var Step = function (_Component) {
+	  (0, _inherits3.default)(Step, _Component);
+
+	  function Step() {
+	    var _ref3;
+
+	    var _temp, _this, _ret;
+
+	    (0, _classCallCheck3.default)(this, Step);
+
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Step.__proto__ || (0, _getPrototypeOf2.default)(Step)).call.apply(_ref3, [this].concat(args))), _this), _this.renderChild = function (child) {
+	      var _this$props = _this.props,
+	          active = _this$props.active,
+	          completed = _this$props.completed,
+	          disabled = _this$props.disabled,
+	          index = _this$props.index,
+	          last = _this$props.last;
+
+	      var icon = index + 1;
+
+	      return _react2.default.cloneElement(child, (0, _simpleAssign2.default)({ active: active, completed: completed, disabled: disabled, icon: icon, last: last }, child.props));
+	    }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+	  }
+
+	  (0, _createClass3.default)(Step, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          active = _props.active,
+	          completed = _props.completed,
+	          disabled = _props.disabled,
+	          index = _props.index,
+	          last = _props.last,
+	          children = _props.children,
+	          style = _props.style,
+	          other = (0, _objectWithoutProperties3.default)(_props, ['active', 'completed', 'disabled', 'index', 'last', 'children', 'style']);
+	      var prepareStyles = this.context.muiTheme.prepareStyles;
+
+	      var styles = getStyles(this.props, this.context);
+
+	      return _react2.default.createElement('div', (0, _extends3.default)({ style: prepareStyles((0, _simpleAssign2.default)(styles.root, style)) }, other), _react2.default.Children.map(children, this.renderChild));
+	    }
+	  }]);
+	  return Step;
+	}(_react.Component);
+
+	Step.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired,
+	  stepper: _react.PropTypes.object
+	};
+	 false ? Step.propTypes = {
+	  /**
+	   * Sets the step as active. Is passed to child components.
+	   */
+	  active: _react.PropTypes.bool,
+	  /**
+	   * Should be `Step` sub-components such as `StepLabel`.
+	   */
+	  children: _react.PropTypes.node,
+	  /**
+	   * Mark the step as completed. Is passed to child components.
+	   */
+	  completed: _react.PropTypes.bool,
+	  /**
+	   * Mark the step as disabled, will also disable the button if
+	   * `StepButton` is a child of `Step`. Is passed to child components.
+	   */
+	  disabled: _react.PropTypes.bool,
+	  /**
+	   * @ignore
+	   * Used internally for numbering.
+	   */
+	  index: _react.PropTypes.number,
+	  /**
+	   * @ignore
+	   */
+	  last: _react.PropTypes.bool,
+	  /**
+	   * Override the inline-style of the root element.
+	   */
+	  style: _react.PropTypes.object
+	} : void 0;
+	exports.default = Step;
+
+/***/ },
+/* 574 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _transitions = __webpack_require__(435);
+
+	var _transitions2 = _interopRequireDefault(_transitions);
+
+	var _EnhancedButton = __webpack_require__(441);
+
+	var _EnhancedButton2 = _interopRequireDefault(_EnhancedButton);
+
+	var _StepLabel = __webpack_require__(575);
+
+	var _StepLabel2 = _interopRequireDefault(_StepLabel);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var isLabel = function isLabel(child) {
+	  return child && child.type && child.type.muiName === 'StepLabel';
+	};
+
+	var getStyles = function getStyles(props, context, state) {
+	  var hovered = state.hovered;
+	  var _context$muiTheme$ste = context.muiTheme.stepper,
+	      backgroundColor = _context$muiTheme$ste.backgroundColor,
+	      hoverBackgroundColor = _context$muiTheme$ste.hoverBackgroundColor;
+
+	  var styles = {
+	    root: {
+	      padding: 0,
+	      backgroundColor: hovered ? hoverBackgroundColor : backgroundColor,
+	      transition: _transitions2.default.easeOut()
+	    }
+	  };
+
+	  if (context.stepper.orientation === 'vertical') {
+	    styles.root.width = '100%';
+	  }
+
+	  return styles;
+	};
+
+	var StepButton = function (_Component) {
+	  (0, _inherits3.default)(StepButton, _Component);
+
+	  function StepButton() {
+	    var _ref;
+
+	    var _temp, _this, _ret;
+
+	    (0, _classCallCheck3.default)(this, StepButton);
+
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = StepButton.__proto__ || (0, _getPrototypeOf2.default)(StepButton)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+	      hovered: false,
+	      touched: false
+	    }, _this.handleMouseEnter = function (event) {
+	      var onMouseEnter = _this.props.onMouseEnter;
+	      // Cancel hover styles for touch devices
+
+	      if (!_this.state.touched) {
+	        _this.setState({ hovered: true });
+	      }
+	      if (typeof onMouseEnter === 'function') {
+	        onMouseEnter(event);
+	      }
+	    }, _this.handleMouseLeave = function (event) {
+	      var onMouseLeave = _this.props.onMouseLeave;
+
+	      _this.setState({ hovered: false });
+	      if (typeof onMouseLeave === 'function') {
+	        onMouseLeave(event);
+	      }
+	    }, _this.handleTouchStart = function (event) {
+	      var onTouchStart = _this.props.onTouchStart;
+
+	      if (!_this.state.touched) {
+	        _this.setState({ touched: true });
+	      }
+	      if (typeof onTouchStart === 'function') {
+	        onTouchStart(event);
+	      }
+	    }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+	  }
+
+	  (0, _createClass3.default)(StepButton, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          active = _props.active,
+	          children = _props.children,
+	          completed = _props.completed,
+	          disabled = _props.disabled,
+	          icon = _props.icon,
+	          iconContainerStyle = _props.iconContainerStyle,
+	          last = _props.last,
+	          onMouseEnter = _props.onMouseEnter,
+	          onMouseLeave = _props.onMouseLeave,
+	          onTouchStart = _props.onTouchStart,
+	          style = _props.style,
+	          other = (0, _objectWithoutProperties3.default)(_props, ['active', 'children', 'completed', 'disabled', 'icon', 'iconContainerStyle', 'last', 'onMouseEnter', 'onMouseLeave', 'onTouchStart', 'style']);
+
+	      var styles = getStyles(this.props, this.context, this.state);
+
+	      var child = isLabel(children) ? children : _react2.default.createElement(_StepLabel2.default, null, children);
+
+	      return _react2.default.createElement(_EnhancedButton2.default, (0, _extends3.default)({
+	        disabled: disabled,
+	        style: (0, _simpleAssign2.default)(styles.root, style),
+	        onMouseEnter: this.handleMouseEnter,
+	        onMouseLeave: this.handleMouseLeave,
+	        onTouchStart: this.handleTouchStart
+	      }, other), _react2.default.cloneElement(child, { active: active, completed: completed, disabled: disabled, icon: icon, iconContainerStyle: iconContainerStyle }));
+	    }
+	  }]);
+	  return StepButton;
+	}(_react.Component);
+
+	StepButton.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired,
+	  stepper: _react.PropTypes.object
+	};
+	 false ? StepButton.propTypes = {
+	  /**
+	   * Passed from `Step` Is passed to StepLabel.
+	   */
+	  active: _react.PropTypes.bool,
+	  /**
+	   * Can be a `StepLabel` or a node to place inside `StepLabel` as children.
+	   */
+	  children: _react.PropTypes.node,
+	  /**
+	   * Sets completed styling. Is passed to StepLabel.
+	   */
+	  completed: _react.PropTypes.bool,
+	  /**
+	   * Disables the button and sets disabled styling. Is passed to StepLabel.
+	   */
+	  disabled: _react.PropTypes.bool,
+	  /**
+	   * The icon displayed by the step label.
+	   */
+	  icon: _react.PropTypes.oneOfType([_react.PropTypes.element, _react.PropTypes.string, _react.PropTypes.number]),
+	  /**
+	   * Override the inline-styles of the icon container element.
+	   */
+	  iconContainerStyle: _react.PropTypes.object,
+	  /** @ignore */
+	  last: _react.PropTypes.bool,
+	  /** @ignore */
+	  onMouseEnter: _react.PropTypes.func,
+	  /** @ignore */
+	  onMouseLeave: _react.PropTypes.func,
+	  /** @ignore */
+	  onTouchStart: _react.PropTypes.func,
+	  /**
+	   * Override the inline-style of the root element.
+	   */
+	  style: _react.PropTypes.object
+	} : void 0;
+	exports.default = StepButton;
+
+/***/ },
+/* 575 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _typeof2 = __webpack_require__(331);
+
+	var _typeof3 = _interopRequireDefault(_typeof2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _checkCircle = __webpack_require__(576);
+
+	var _checkCircle2 = _interopRequireDefault(_checkCircle);
+
+	var _SvgIcon = __webpack_require__(479);
+
+	var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var getStyles = function getStyles(_ref, _ref2) {
+	  var active = _ref.active,
+	      completed = _ref.completed,
+	      disabled = _ref.disabled;
+	  var muiTheme = _ref2.muiTheme,
+	      stepper = _ref2.stepper;
+	  var _muiTheme$stepper = muiTheme.stepper,
+	      textColor = _muiTheme$stepper.textColor,
+	      disabledTextColor = _muiTheme$stepper.disabledTextColor,
+	      iconColor = _muiTheme$stepper.iconColor,
+	      inactiveIconColor = _muiTheme$stepper.inactiveIconColor;
+	  var orientation = stepper.orientation;
+
+	  var styles = {
+	    root: {
+	      height: orientation === 'horizontal' ? 72 : 64,
+	      color: textColor,
+	      display: 'flex',
+	      alignItems: 'center',
+	      fontSize: 14,
+	      paddingLeft: 14,
+	      paddingRight: 14
+	    },
+	    icon: {
+	      color: iconColor,
+	      display: 'block',
+	      fontSize: 24,
+	      width: 24,
+	      height: 24
+	    },
+	    iconContainer: {
+	      paddingRight: 8
+	    }
+	  };
+
+	  if (active) {
+	    styles.root.fontWeight = 500;
+	  }
+
+	  if (!completed && !active) {
+	    styles.icon.color = inactiveIconColor;
+	  }
+
+	  if (disabled) {
+	    styles.icon.color = inactiveIconColor;
+	    styles.root.color = disabledTextColor;
+	    styles.root.cursor = 'not-allowed';
+	  }
+
+	  return styles;
+	};
+
+	var renderIcon = function renderIcon(completed, icon, styles) {
+	  var iconType = typeof icon === 'undefined' ? 'undefined' : (0, _typeof3.default)(icon);
+
+	  if (iconType === 'number' || iconType === 'string') {
+	    if (completed) {
+	      return _react2.default.createElement(_checkCircle2.default, {
+	        color: styles.icon.color,
+	        style: styles.icon
+	      });
+	    }
+
+	    return _react2.default.createElement(_SvgIcon2.default, { color: styles.icon.color, style: styles.icon }, _react2.default.createElement('circle', { cx: '12', cy: '12', r: '10' }), _react2.default.createElement('text', {
+	      x: '12',
+	      y: '16',
+	      textAnchor: 'middle',
+	      fontSize: '12',
+	      fill: '#fff'
+	    }, icon));
+	  }
+
+	  return icon;
+	};
+
+	var StepLabel = function StepLabel(props, context) {
+	  var active = props.active,
+	      children = props.children,
+	      completed = props.completed,
+	      userIcon = props.icon,
+	      iconContainerStyle = props.iconContainerStyle,
+	      last = props.last,
+	      style = props.style,
+	      other = (0, _objectWithoutProperties3.default)(props, ['active', 'children', 'completed', 'icon', 'iconContainerStyle', 'last', 'style']);
+	  var prepareStyles = context.muiTheme.prepareStyles;
+
+	  var styles = getStyles(props, context);
+	  var icon = renderIcon(completed, userIcon, styles);
+
+	  return _react2.default.createElement('span', (0, _extends3.default)({ style: prepareStyles((0, _simpleAssign2.default)(styles.root, style)) }, other), icon && _react2.default.createElement('span', { style: prepareStyles((0, _simpleAssign2.default)(styles.iconContainer, iconContainerStyle)) }, icon), children);
+	};
+
+	StepLabel.muiName = 'StepLabel';
+
+	 false ? StepLabel.propTypes = {
+	  /**
+	   * Sets active styling. Overrides disabled coloring.
+	   */
+	  active: _react.PropTypes.bool,
+	  /**
+	   * The label text node
+	   */
+	  children: _react.PropTypes.node,
+	  /**
+	   * Sets completed styling. Overrides disabled coloring.
+	   */
+	  completed: _react.PropTypes.bool,
+	  /**
+	   * Sets disabled styling.
+	   */
+	  disabled: _react.PropTypes.bool,
+	  /**
+	   * The icon displayed by the step label.
+	   */
+	  icon: _react.PropTypes.oneOfType([_react.PropTypes.element, _react.PropTypes.string, _react.PropTypes.number]),
+	  /**
+	   * Override the inline-styles of the icon container element.
+	   */
+	  iconContainerStyle: _react.PropTypes.object,
+	  /**
+	   * @ignore
+	   */
+	  last: _react.PropTypes.bool,
+	  /**
+	   * Override the inline-style of the root element.
+	   */
+	  style: _react.PropTypes.object
+	} : void 0;
+
+	StepLabel.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired,
+	  stepper: _react.PropTypes.object
+	};
+
+	exports.default = StepLabel;
+
+/***/ },
+/* 576 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _pure = __webpack_require__(472);
+
+	var _pure2 = _interopRequireDefault(_pure);
+
+	var _SvgIcon = __webpack_require__(479);
+
+	var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var ActionCheckCircle = function ActionCheckCircle(props) {
+	  return _react2.default.createElement(_SvgIcon2.default, props, _react2.default.createElement('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z' }));
+	};
+	ActionCheckCircle = (0, _pure2.default)(ActionCheckCircle);
+	ActionCheckCircle.displayName = 'ActionCheckCircle';
+	ActionCheckCircle.muiName = 'SvgIcon';
+
+	exports.default = ActionCheckCircle;
+
+/***/ },
+/* 577 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _ExpandTransition = __webpack_require__(578);
+
+	var _ExpandTransition2 = _interopRequireDefault(_ExpandTransition);
+
+	var _warning = __webpack_require__(222);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	function ExpandTransition(props) {
+	  return _react2.default.createElement(_ExpandTransition2.default, props);
+	}
+
+	var getStyles = function getStyles(props, context) {
+	  var styles = {
+	    root: {
+	      marginTop: -14,
+	      marginLeft: 14 + 11, // padding + 1/2 icon
+	      paddingLeft: 24 - 11 + 8,
+	      paddingRight: 16,
+	      overflow: 'hidden'
+	    }
+	  };
+
+	  if (!props.last) {
+	    styles.root.borderLeft = '1px solid ' + context.muiTheme.stepper.connectorLineColor;
+	  }
+
+	  return styles;
+	};
+
+	var StepContent = function (_Component) {
+	  (0, _inherits3.default)(StepContent, _Component);
+
+	  function StepContent() {
+	    (0, _classCallCheck3.default)(this, StepContent);
+	    return (0, _possibleConstructorReturn3.default)(this, (StepContent.__proto__ || (0, _getPrototypeOf2.default)(StepContent)).apply(this, arguments));
+	  }
+
+	  (0, _createClass3.default)(StepContent, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          active = _props.active,
+	          children = _props.children,
+	          completed = _props.completed,
+	          last = _props.last,
+	          style = _props.style,
+	          transition = _props.transition,
+	          transitionDuration = _props.transitionDuration,
+	          other = (0, _objectWithoutProperties3.default)(_props, ['active', 'children', 'completed', 'last', 'style', 'transition', 'transitionDuration']);
+	      var _context = this.context,
+	          stepper = _context.stepper,
+	          prepareStyles = _context.muiTheme.prepareStyles;
+
+	      if (stepper.orientation !== 'vertical') {
+	         false ? (0, _warning2.default)(false, 'Material-UI: <StepContent /> is only designed for use with the vertical stepper.') : void 0;
+	        return null;
+	      }
+
+	      var styles = getStyles(this.props, this.context);
+	      var transitionProps = {
+	        enterDelay: transitionDuration,
+	        transitionDuration: transitionDuration,
+	        open: active
+	      };
+
+	      return _react2.default.createElement('div', (0, _extends3.default)({ style: prepareStyles((0, _simpleAssign2.default)(styles.root, style)) }, other), _react2.default.createElement(transition, transitionProps, _react2.default.createElement('div', { style: { overflow: 'hidden' } }, children)));
+	    }
+	  }]);
+	  return StepContent;
+	}(_react.Component);
+
+	StepContent.defaultProps = {
+	  transition: ExpandTransition,
+	  transitionDuration: 450
+	};
+	StepContent.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired,
+	  stepper: _react.PropTypes.object
+	};
+	 false ? StepContent.propTypes = {
+	  /**
+	   * Expands the content
+	   */
+	  active: _react.PropTypes.bool,
+	  /**
+	   * Step content
+	   */
+	  children: _react.PropTypes.node,
+	  /**
+	   * @ignore
+	   */
+	  completed: _react.PropTypes.bool,
+	  /**
+	   * @ignore
+	   */
+	  last: _react.PropTypes.bool,
+	  /**
+	   * Override the inline-style of the root element.
+	   */
+	  style: _react.PropTypes.object,
+	  /**
+	   * ReactTransitionGroup component.
+	   */
+	  transition: _react.PropTypes.func,
+	  /**
+	   * Adjust the duration of the content expand transition. Passed as a prop to the transition component.
+	   */
+	  transitionDuration: _react.PropTypes.number
+	} : void 0;
+	exports.default = StepContent;
+
+/***/ },
+/* 578 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactAddonsTransitionGroup = __webpack_require__(448);
+
+	var _reactAddonsTransitionGroup2 = _interopRequireDefault(_reactAddonsTransitionGroup);
+
+	var _ExpandTransitionChild = __webpack_require__(579);
+
+	var _ExpandTransitionChild2 = _interopRequireDefault(_ExpandTransitionChild);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var ExpandTransition = function (_Component) {
+	  (0, _inherits3.default)(ExpandTransition, _Component);
+
+	  function ExpandTransition() {
+	    (0, _classCallCheck3.default)(this, ExpandTransition);
+	    return (0, _possibleConstructorReturn3.default)(this, (ExpandTransition.__proto__ || (0, _getPrototypeOf2.default)(ExpandTransition)).apply(this, arguments));
+	  }
+
+	  (0, _createClass3.default)(ExpandTransition, [{
+	    key: 'renderChildren',
+	    value: function renderChildren(children) {
+	      var _props = this.props,
+	          enterDelay = _props.enterDelay,
+	          transitionDelay = _props.transitionDelay,
+	          transitionDuration = _props.transitionDuration;
+
+	      return _react2.default.Children.map(children, function (child) {
+	        return _react2.default.createElement(_ExpandTransitionChild2.default, {
+	          enterDelay: enterDelay,
+	          transitionDelay: transitionDelay,
+	          transitionDuration: transitionDuration,
+	          key: child.key
+	        }, child);
+	      }, this);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props2 = this.props,
+	          children = _props2.children,
+	          enterDelay = _props2.enterDelay,
+	          loading = _props2.loading,
+	          open = _props2.open,
+	          style = _props2.style,
+	          transitionDelay = _props2.transitionDelay,
+	          transitionDuration = _props2.transitionDuration,
+	          other = (0, _objectWithoutProperties3.default)(_props2, ['children', 'enterDelay', 'loading', 'open', 'style', 'transitionDelay', 'transitionDuration']);
+	      var prepareStyles = this.context.muiTheme.prepareStyles;
+
+	      var mergedRootStyles = (0, _simpleAssign2.default)({}, {
+	        position: 'relative',
+	        overflow: 'hidden',
+	        height: '100%'
+	      }, style);
+
+	      var newChildren = loading ? [] : this.renderChildren(children);
+
+	      return _react2.default.createElement(_reactAddonsTransitionGroup2.default, (0, _extends3.default)({
+	        style: prepareStyles(mergedRootStyles),
+	        component: 'div'
+	      }, other), open && newChildren);
+	    }
+	  }]);
+	  return ExpandTransition;
+	}(_react.Component);
+
+	ExpandTransition.defaultProps = {
+	  enterDelay: 0,
+	  transitionDelay: 0,
+	  transitionDuration: 450,
+	  loading: false,
+	  open: false
+	};
+	ExpandTransition.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired
+	};
+	 false ? ExpandTransition.propTypes = {
+	  children: _react.PropTypes.node,
+	  enterDelay: _react.PropTypes.number,
+	  loading: _react.PropTypes.bool,
+	  open: _react.PropTypes.bool,
+	  style: _react.PropTypes.object,
+	  transitionDelay: _react.PropTypes.number,
+	  transitionDuration: _react.PropTypes.number
+	} : void 0;
+	exports.default = ExpandTransition;
+
+/***/ },
+/* 579 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(28);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _transitions = __webpack_require__(435);
+
+	var _transitions2 = _interopRequireDefault(_transitions);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var reflow = function reflow(elem) {
+	  return elem.offsetHeight;
+	};
+
+	var ExpandTransitionChild = function (_Component) {
+	  (0, _inherits3.default)(ExpandTransitionChild, _Component);
+
+	  function ExpandTransitionChild() {
+	    (0, _classCallCheck3.default)(this, ExpandTransitionChild);
+	    return (0, _possibleConstructorReturn3.default)(this, (ExpandTransitionChild.__proto__ || (0, _getPrototypeOf2.default)(ExpandTransitionChild)).apply(this, arguments));
+	  }
+
+	  (0, _createClass3.default)(ExpandTransitionChild, [{
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      clearTimeout(this.enterTimer);
+	      clearTimeout(this.enteredTimer);
+	      clearTimeout(this.leaveTimer);
+	    }
+	  }, {
+	    key: 'componentWillAppear',
+	    value: function componentWillAppear(callback) {
+	      this.open();
+	      callback();
+	    }
+	  }, {
+	    key: 'componentDidAppear',
+	    value: function componentDidAppear() {
+	      this.setAutoHeight();
+	    }
+	  }, {
+	    key: 'componentWillEnter',
+	    value: function componentWillEnter(callback) {
+	      var _this2 = this;
+
+	      var _props = this.props,
+	          enterDelay = _props.enterDelay,
+	          transitionDelay = _props.transitionDelay,
+	          transitionDuration = _props.transitionDuration;
+
+	      var element = _reactDom2.default.findDOMNode(this);
+	      element.style.height = 0;
+	      this.enterTimer = setTimeout(function () {
+	        return _this2.open();
+	      }, enterDelay);
+	      this.enteredTimer = setTimeout(function () {
+	        return callback();
+	      }, enterDelay + transitionDelay + transitionDuration);
+	    }
+	  }, {
+	    key: 'componentDidEnter',
+	    value: function componentDidEnter() {
+	      this.setAutoHeight();
+	    }
+	  }, {
+	    key: 'componentWillLeave',
+	    value: function componentWillLeave(callback) {
+	      var _props2 = this.props,
+	          transitionDelay = _props2.transitionDelay,
+	          transitionDuration = _props2.transitionDuration;
+
+	      var element = _reactDom2.default.findDOMNode(this);
+	      // Set fixed height first for animated property value
+	      element.style.height = this.refs.wrapper.clientHeight + 'px';
+	      reflow(element);
+	      element.style.transitionDuration = transitionDuration + 'ms';
+	      element.style.height = 0;
+	      this.leaveTimer = setTimeout(function () {
+	        return callback();
+	      }, transitionDelay + transitionDuration);
+	    }
+	  }, {
+	    key: 'setAutoHeight',
+	    value: function setAutoHeight() {
+	      var _ReactDOM$findDOMNode = _reactDom2.default.findDOMNode(this),
+	          style = _ReactDOM$findDOMNode.style;
+
+	      style.transitionDuration = 0;
+	      style.height = 'auto';
+	    }
+	  }, {
+	    key: 'open',
+	    value: function open() {
+	      var element = _reactDom2.default.findDOMNode(this);
+	      element.style.height = this.refs.wrapper.clientHeight + 'px';
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props3 = this.props,
+	          children = _props3.children,
+	          enterDelay = _props3.enterDelay,
+	          style = _props3.style,
+	          transitionDelay = _props3.transitionDelay,
+	          transitionDuration = _props3.transitionDuration,
+	          other = (0, _objectWithoutProperties3.default)(_props3, ['children', 'enterDelay', 'style', 'transitionDelay', 'transitionDuration']);
+	      var prepareStyles = this.context.muiTheme.prepareStyles;
+
+	      var mergedRootStyles = (0, _simpleAssign2.default)({
+	        position: 'relative',
+	        height: 0,
+	        width: '100%',
+	        top: 0,
+	        left: 0,
+	        overflow: 'hidden',
+	        transition: _transitions2.default.easeOut(transitionDuration + 'ms', ['height'], transitionDelay + 'ms')
+	      }, style);
+
+	      return _react2.default.createElement('div', (0, _extends3.default)({}, other, { style: prepareStyles(mergedRootStyles) }), _react2.default.createElement('div', { ref: 'wrapper' }, children));
+	    }
+	  }]);
+	  return ExpandTransitionChild;
+	}(_react.Component);
+
+	ExpandTransitionChild.defaultProps = {
+	  enterDelay: 0,
+	  transitionDelay: 0,
+	  transitionDuration: 450
+	};
+	ExpandTransitionChild.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired
+	};
+	 false ? ExpandTransitionChild.propTypes = {
+	  children: _react.PropTypes.node,
+	  enterDelay: _react.PropTypes.number,
+	  style: _react.PropTypes.object,
+	  transitionDelay: _react.PropTypes.number,
+	  transitionDuration: _react.PropTypes.number
+	} : void 0;
+	exports.default = ExpandTransitionChild;
+
+/***/ },
+/* 580 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _StepConnector = __webpack_require__(581);
+
+	var _StepConnector2 = _interopRequireDefault(_StepConnector);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var getStyles = function getStyles(props) {
+	  var orientation = props.orientation;
+
+	  return {
+	    root: {
+	      display: 'flex',
+	      flexDirection: orientation === 'horizontal' ? 'row' : 'column',
+	      alignContent: 'center',
+	      alignItems: orientation === 'horizontal' ? 'center' : 'stretch',
+	      justifyContent: 'space-between'
+	    }
+	  };
+	};
+
+	var Stepper = function (_Component) {
+	  (0, _inherits3.default)(Stepper, _Component);
+
+	  function Stepper() {
+	    (0, _classCallCheck3.default)(this, Stepper);
+	    return (0, _possibleConstructorReturn3.default)(this, (Stepper.__proto__ || (0, _getPrototypeOf2.default)(Stepper)).apply(this, arguments));
+	  }
+
+	  (0, _createClass3.default)(Stepper, [{
+	    key: 'getChildContext',
+	    value: function getChildContext() {
+	      var orientation = this.props.orientation;
+
+	      return { stepper: { orientation: orientation } };
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          activeStep = _props.activeStep,
+	          children = _props.children,
+	          linear = _props.linear,
+	          style = _props.style;
+	      var prepareStyles = this.context.muiTheme.prepareStyles;
+
+	      var styles = getStyles(this.props, this.context);
+
+	      /**
+	       * One day, we may be able to use real CSS tools
+	       * For now, we need to create our own "pseudo" elements
+	       * and nth child selectors, etc
+	       * That's what some of this garbage is for :)
+	       */
+	      var numChildren = _react.Children.count(children);
+	      var steps = _react.Children.map(children, function (step, index) {
+	        var controlProps = { index: index };
+
+	        if (activeStep === index) {
+	          controlProps.active = true;
+	        } else if (linear && activeStep > index) {
+	          controlProps.completed = true;
+	        } else if (linear && activeStep < index) {
+	          controlProps.disabled = true;
+	        }
+
+	        if (index + 1 === numChildren) {
+	          controlProps.last = true;
+	        }
+
+	        return [index > 0 && _react2.default.createElement(_StepConnector2.default, null), _react2.default.cloneElement(step, (0, _simpleAssign2.default)(controlProps, step.props))];
+	      });
+
+	      return _react2.default.createElement('div', { style: prepareStyles((0, _simpleAssign2.default)(styles.root, style)) }, steps);
+	    }
+	  }]);
+	  return Stepper;
+	}(_react.Component);
+
+	Stepper.defaultProps = {
+	  orientation: 'horizontal',
+	  linear: true
+	};
+	Stepper.contextTypes = { muiTheme: _react.PropTypes.object.isRequired };
+	Stepper.childContextTypes = { stepper: _react.PropTypes.object };
+	 false ? Stepper.propTypes = {
+	  /**
+	   * Set the active step (zero based index). This will enable `Step` control helpers.
+	   */
+	  activeStep: _react.PropTypes.number,
+	  /**
+	   * Should be two or more `<Step />` components
+	   */
+	  children: _react.PropTypes.arrayOf(_react.PropTypes.node),
+	  /**
+	   * If set to `true`, the `Stepper` will assist in controlling steps for linear flow
+	   */
+	  linear: _react.PropTypes.bool,
+	  /**
+	   * The stepper orientation (layout flow direction)
+	   */
+	  orientation: _react.PropTypes.oneOf(['horizontal', 'vertical']),
+	  /**
+	   * Override the inline-style of the root element.
+	   */
+	  style: _react.PropTypes.object
+	} : void 0;
+	exports.default = Stepper;
+
+/***/ },
+/* 581 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.PlainStepConnector = undefined;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _pure = __webpack_require__(472);
+
+	var _pure2 = _interopRequireDefault(_pure);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	var propTypes = {
+	  /**
+	   * Override the inline-style of the root element.
+	   */
+	  style: _react.PropTypes.object
+	};
+
+	var contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired,
+	  stepper: _react.PropTypes.object
+	};
+
+	var StepConnector = function StepConnector(props, context) {
+	  var muiTheme = context.muiTheme,
+	      stepper = context.stepper;
+
+	  var styles = {
+	    wrapper: {
+	      flex: '1 1 auto'
+	    },
+	    line: {
+	      display: 'block',
+	      borderColor: muiTheme.stepper.connectorLineColor
+	    }
+	  };
+
+	  /**
+	   * Clean up once we can use CSS pseudo elements
+	   */
+	  if (stepper.orientation === 'horizontal') {
+	    styles.line.marginLeft = -6;
+	    styles.line.borderTopStyle = 'solid';
+	    styles.line.borderTopWidth = 1;
+	  } else if (stepper.orientation === 'vertical') {
+	    styles.wrapper.marginLeft = 14 + 11; // padding + 1/2 icon
+	    styles.line.borderLeftStyle = 'solid';
+	    styles.line.borderLeftWidth = 1;
+	    styles.line.minHeight = 28;
+	  }
+
+	  var prepareStyles = muiTheme.prepareStyles;
+
+	  return _react2.default.createElement('div', { style: prepareStyles(styles.wrapper) }, _react2.default.createElement('span', { style: prepareStyles(styles.line) }));
+	};
+
+	 false ? StepConnector.propTypes = propTypes : void 0;
+	StepConnector.contextTypes = contextTypes;
+
+	exports.PlainStepConnector = StepConnector;
+	exports.default = (0, _pure2.default)(StepConnector);
+
+/***/ },
+/* 582 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(215);
+
+	var _Paper = __webpack_require__(425);
+
+	var _Paper2 = _interopRequireDefault(_Paper);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'NoAuth',
+	  render: function render() {
+	    return _react2.default.createElement(
+	      _Paper2.default,
+	      { style: { margin: '8px', padding: '8px' } },
+	      _react2.default.createElement(
+	        'h3',
+	        { className: 'text-center' },
+	        'You have to login to see this page.'
+	      ),
+	      _react2.default.createElement(
+	        'p',
+	        { className: 'text-center' },
+	        'Not a user? ',
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/signup' },
+	          'Sign up'
+	        )
 	      )
 	    );
 	  }

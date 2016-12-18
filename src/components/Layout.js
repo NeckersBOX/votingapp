@@ -17,8 +17,6 @@ export default React.createClass ({
       color: 'white'
     };
 
-    /* TODO: Add class hide-sm ( and hide-md, hide-lg? ) and show-* in the same way. */
-
     let AppBarMenu = null;
     if ( typeof this.props.state == 'undefined' || !this.props.state.user  ) {
       AppBarMenu = (
@@ -49,10 +47,12 @@ export default React.createClass ({
               <FontIcon className="material-icons">home</FontIcon>
             }/>
           </Link>
-          <FlatButton label="New Pull" style={buttonStyle} icon={
-            <FontIcon className="material-icons">playlist_add</FontIcon>
-          }/>
-          <FlatButton label="My Pull" style={buttonStyle} icon={
+          <Link to="/add-poll">
+            <FlatButton label="New Poll" style={buttonStyle} icon={
+              <FontIcon className="material-icons">playlist_add</FontIcon>
+            }/>
+          </Link>
+          <FlatButton label="My Poll" style={buttonStyle} icon={
             <FontIcon className="material-icons">account_circle</FontIcon>
           }/>
           <Link to="/logout">

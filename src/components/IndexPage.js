@@ -13,9 +13,11 @@ export default React.createClass ({
         <Paper style={{ padding: '8px', marginBottom: '8px' }}>
           <h1 className="text-center">Voting App</h1>
           <h2 className="text-center">Create custom polls with live results.</h2>
-          <Link to="/signup">
-            <RaisedButton fullWidth={true} primary={true} label="Sign Up Now" />
-          </Link>
+          { ( typeof this.props.state == 'undefined' || !this.props.state.user ) ? (
+            <Link to="/signup">
+              <RaisedButton fullWidth={true} primary={true} label="Sign Up Now" />
+            </Link> ) : ''
+          }
         </Paper>
 
         <Tabs className="no-main">

@@ -22,7 +22,7 @@ export default React.createClass ({
         <h1 className="text-center">Login</h1>
         <p className="text-center">
           Not register yet?
-          <Link to='/signup'>
+          <Link to='/signup' className="margin-horizontal">
             Sign Up
           </Link>
         </p>
