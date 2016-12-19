@@ -4,6 +4,8 @@ const initState = {
 };
 
 const voteReducer = (state, action) => {
+  {/* User in localStore? */}
+  
   if ( typeof state === 'undefined' ) {
     return initState;
   }

@@ -1,5 +1,11 @@
 import React from 'react';
 import CircularProgress from 'material-ui/CircularProgress';
+import { List, ListItem } from 'material-ui/List';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem'
+import Paper from 'material-ui/Paper';
 
 import NoAuth from './NoAuth';
 
@@ -53,9 +59,59 @@ export default React.createClass ({
         </div>
       );
 
-    console.log (this.state.polls);
-    return (
-      <h1>My Polls</h1>
+    let listPolls = (
+      <Paper style={{ padding: '8px', margin: '8px' }}>
+        <h2 className="text-center">No polls found.</h2>
+      </Paper>
     );
+
+    if ( this.state.polls.length ) {
+      let listPollsItem = this.state.polls.map ((val, id) => {
+        let date = new Date (val.published_time * 1000);
+        let month = [
+          'January', 'February', 'March', 'April', 'May', 'June', 'July',
+          'August', 'September', 'October', 'November', 'December'
+        ];
+
+        let statsInfo = [
+          date.getDate (), month[date.getMonth ()], date.getFullYear (),
+          date.getHours () + ':' + date.getMinutes (), '- Votes:', val.votes
+        ].join (' ');
+
+        let rightIconMenu = (
+          <IconMenu iconButtonElement={
+            <IconButton touch={true} tooltip="Actions" tooltipPosition="bottom-left">
+              <MoreVertIcon />
+            </IconButton>
+          }>
+            <MenuItem>Show</MenuItem>
+            <MenuItem>Remove</MenuItem>
+          </IconMenu>
+        );
+
+        return (
+          <ListItem key={id} style={{ textAlign: 'left' }} primaryText={val.question} disabled={true}
+            secondaryText={statsInfo} rightIconButton={rightIconMenu} />
+        );
+      });
+
+      listPolls = (
+        <Paper style={{ padding: '8px', margin: '8px' }}>
+          <List>
+            {listPollsItem}
+          </List>
+        </Paper>
+      );
+    }
+
+    return (
+      <div className="align-center">
+        <h1>My Polls</h1>
+        {listPolls}
+      </div>
+    );
+  },
+  removePoll (poll_id) {
+    console.log ('poll_id: ', poll_id);
   }
 })
