@@ -56212,6 +56212,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(215);
+
 	var _Stepper = __webpack_require__(572);
 
 	var _RaisedButton = __webpack_require__(436);
@@ -56518,9 +56520,41 @@
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
 	      } else if (data.error === null) {
-	        _this4.setState({ loading: false, published: true });
+	        _this4.setState({
+	          loading: false,
+	          published: _react2.default.createElement(
+	            'div',
+	            { className: 'align-center' },
+	            _react2.default.createElement(
+	              'h2',
+	              { className: 'text-center' },
+	              'Hoo-ray! Poll published!'
+	            ),
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { to: data.url },
+	              _react2.default.createElement(_RaisedButton2.default, { primary: true, label: 'Show this poll' })
+	            )
+	          )
+	        });
 	      } else {
-	        _this4.setState({ loading: false, published: true });
+	        _this4.setState({
+	          loading: false,
+	          published: _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(
+	              'h2',
+	              { className: 'text-center' },
+	              'Error while publish the poll'
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              { className: 'text-center' },
+	              data.error
+	            )
+	          )
+	        });
 	      }
 
 	      _this4.props.state.io.removeListener('add-poll:res');

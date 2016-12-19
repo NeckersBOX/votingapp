@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -222,10 +223,28 @@ export default React.createClass ({
         console.warn (data.server_error);
       }
       else if ( data.error === null ) {
-        this.setState ({ loading: false, published: true });
+        this.setState ({
+          loading: false,
+          published: (
+            <div className="align-center">
+              <h2 className="text-center">Hoo-ray! Poll published!</h2>
+              <Link to={data.url}>
+                <RaisedButton primary={true} label="Show this poll" />
+              </Link>
+            </div>
+          )
+        });
       }
       else {
-        this.setState ({ loading: false, published: true });
+        this.setState ({
+          loading: false,
+          published: (
+            <div>
+              <h2 className="text-center">Error while publish the poll</h2>
+              <p className="text-center">{data.error}</p>
+            </div>
+          )
+        });
       }
 
       this.props.state.io.removeListener ('add-poll:res');
