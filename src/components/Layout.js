@@ -52,9 +52,11 @@ export default React.createClass ({
               <FontIcon className="material-icons">playlist_add</FontIcon>
             }/>
           </Link>
-          <FlatButton label="My Poll" style={buttonStyle} icon={
-            <FontIcon className="material-icons">account_circle</FontIcon>
-          }/>
+          <Link to="/my-poll">
+            <FlatButton label="My Polls" style={buttonStyle} icon={
+              <FontIcon className="material-icons">account_circle</FontIcon>
+            }/>
+          </Link>
           <Link to="/logout">
             <FlatButton label="Logout" style={buttonStyle} icon={
               <FontIcon className="material-icons">directions_run</FontIcon>

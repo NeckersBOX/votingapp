@@ -4,6 +4,7 @@ import signup_handle from './socket_handles/signup';
 import login_handle from './socket_handles/login';
 import logout_handle from './socket_handles/logout';
 import addpoll_handle from './socket_handles/addpoll';
+import mypolls_handle from './socket_handles/mypolls';
 
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
@@ -11,6 +12,7 @@ const socket_handle = (io) => {
     socket.on ('login:req', (data) => login_handle (socket, data));
     socket.on ('logout:req', (data) => logout_handle (socket, data));
     socket.on ('add-poll:req', (data) => addpoll_handle (socket, data));
+    socket.on ('my-polls:req', (data) => mypolls_handle (socket, data));
   });
 
   /* TODO: on disconnect can be handled? */

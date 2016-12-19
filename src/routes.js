@@ -7,6 +7,7 @@ import LoginPage from './components/LoginPage';
 import LogoutPage from './components/LogoutPage';
 import NotFoundPage from './components/NotFoundPage';
 import AddPollPage from './components/AddPollPage';
+import MyPollPage from './components/MyPollPage';
 
 const routes = (
   <Route path="/" component={Layout}>
@@ -15,6 +16,7 @@ const routes = (
     <Route path="login" component={LoginPage} />
     <Route path="logout" component={LogoutPage} />
     <Route path="add-poll" component={AddPollPage} />
+    <Route path="my-poll" component={MyPollPage} />
     <Route path="*" component={NotFoundPage} />
   </Route>
 );

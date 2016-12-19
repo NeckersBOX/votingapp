@@ -36218,6 +36218,10 @@
 
 	var _AddPollPage2 = _interopRequireDefault(_AddPollPage);
 
+	var _MyPollPage = __webpack_require__(594);
+
+	var _MyPollPage2 = _interopRequireDefault(_MyPollPage);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var routes = _react2.default.createElement(
@@ -36228,6 +36232,7 @@
 	  _react2.default.createElement(_reactRouter.Route, { path: 'login', component: _LoginPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'logout', component: _LogoutPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'add-poll', component: _AddPollPage2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'my-poll', component: _MyPollPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundPage2.default })
 	);
 
@@ -40475,11 +40480,15 @@
 	              'playlist_add'
 	            ) })
 	        ),
-	        _react2.default.createElement(_FlatButton2.default, { label: 'My Poll', style: buttonStyle, icon: _react2.default.createElement(
-	            _FontIcon2.default,
-	            { className: 'material-icons' },
-	            'account_circle'
-	          ) }),
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/my-poll' },
+	          _react2.default.createElement(_FlatButton2.default, { label: 'My Polls', style: buttonStyle, icon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'account_circle'
+	            ) })
+	        ),
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/logout' },
@@ -59428,6 +59437,94 @@
 	          'Sign up'
 	        )
 	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 594 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _CircularProgress = __webpack_require__(591);
+
+	var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
+
+	var _NoAuth = __webpack_require__(593);
+
+	var _NoAuth2 = _interopRequireDefault(_NoAuth);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'MyPollPage',
+	  getInitialState: function getInitialState() {
+	    return { loading: true, error: null, polls: [] };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+
+	    if (typeof this.props.state == 'undefined' || !this.props.state.user) return;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'my-polls:req',
+	      data: { $user: this.props.state.user }
+	    });
+
+	    this.props.state.io.on('my-polls:res', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        _this.setState({ loading: false, polls: data.polls });
+	      } else {
+	        _this.setState({ loading: false, error: data.error });
+	      }
+
+	      _this.props.state.io.removeListener('my-polls:res');
+	    });
+	  },
+	  componentDidUnmount: function componentDidUnmount() {
+	    this.props.state.io.removeListener('my-polls:res');
+	  },
+	  render: function render() {
+	    if (typeof this.props.state == 'undefined' || !this.props.state.user) return _react2.default.createElement(_NoAuth2.default, null);
+
+	    if (this.state.loading) return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      _react2.default.createElement(_CircularProgress2.default, { size: 80, thickness: 7 })
+	    );
+
+	    if (this.state.error) return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h2',
+	        { className: 'text-center' },
+	        'Oh no! An error occurred!'
+	      ),
+	      _react2.default.createElement(
+	        'p',
+	        { className: 'text-center text-error' },
+	        this.state.error
+	      )
+	    );
+
+	    console.log(this.state.polls);
+	    return _react2.default.createElement(
+	      'h1',
+	      null,
+	      'My Polls'
 	    );
 	  }
 	});
