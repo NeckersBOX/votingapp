@@ -1,6 +1,6 @@
 {
   "name": "voteapp",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Voting App - freeCodeCamp Challenge",
   "main": "index.js",
   "scripts": {
