@@ -7,6 +7,7 @@ import { List, ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
+import CircularProgress from 'material-ui/CircularProgress';
 
 import NoAuth from './NoAuth';
 
@@ -25,7 +26,7 @@ const QuestionStep = React.createClass ({
     return (
       <div>
         <p>Chose a name for the poll</p>
-        <TextField hintText="Ex. Whats your age?" id="poll_name" name="poll_name" type="text"
+        <TextField hintText="Ex. What's your age?" id="poll_name" name="poll_name" type="text"
           value={this.state.name} onChange={this.changeName} />
         <p className="text-small muted">Minimum 6 characters</p>
       </div>
@@ -44,18 +45,21 @@ const QuestionStep = React.createClass ({
 
 const AddOption = React.createClass ({
   getInitialState () {
-    return {
-      show_btn: true,
-      option: ''
-    };
+    return { option: '' };
   },
   render () {
-    if ( this.state.show_btn )
-      return <RaisedButton secondary={true} label="Add Option" onClick={
-        () => this.setState ({ show_btn: false })
-      } />;
-
-    return <p>Add Option Form</p>;
+    return (
+      <div>
+        <TextField hintText="Ex. 20 years old" id="poll_option" name="poll_option" type="text"
+          value={this.state.option} onChange={(e) => this.setState ({ option: e.target.value })} />
+        <RaisedButton secondary={true} label="Add Option" onClick={this.sendOption}
+          disabled={!this.state.option.trim ().length} />
+      </div>
+    );
+  },
+  sendOption () {
+    this.setState ({ option: '' });
+    this.props.callback (this.state.option)
   }
 });
 
@@ -128,14 +132,6 @@ const OptionsStep = React.createClass ({
   }
 });
 
-const PublishStep = React.createClass ({
-  render () {
-    return (
-      <p>Publish Step</p>
-    );
-  }
-});
-
 export default React.createClass ({
   getInitialState () {
     return {
@@ -144,12 +140,24 @@ export default React.createClass ({
       poll: {
         name: '',
         options: []
-      }
+      },
+      published: null,
+      loading: false
     };
   },
   render () {
     if ( typeof this.props.state == 'undefined' || !this.props.state.user )
       return <NoAuth />;
+
+    if ( this.state.loading )
+      return (
+        <div className="align-center">
+          <CircularProgress size={80} thickness={7} />
+        </div>
+      );
+
+    if ( this.state.published )
+      return <div className="align-center">{this.state.published}</div>;
 
     let stepContent = <p className="text-error">Invalid Step</p>;
     switch (this.state.step) {
@@ -158,9 +166,6 @@ export default React.createClass ({
         break;
       case 1:
         stepContent = <OptionsStep poll={this.state.poll} completed={this.stepCompleted} />;
-        break;
-      case 2:
-        stepContent = <PublishStep poll={this.state.poll} />;
         break;
     }
 
@@ -176,9 +181,6 @@ export default React.createClass ({
             <Step>
               <StepLabel>Options</StepLabel>
             </Step>
-            <Step>
-              <StepLabel>Publish</StepLabel>
-            </Step>
           </Stepper>
 
           {stepContent}
@@ -188,13 +190,12 @@ export default React.createClass ({
               () => this.setState ({ step: this.state.step - 1 })
             } /> : ''}
 
-          {(this.state.step < 2) ?
+          {(this.state.step < 1) ?
             <RaisedButton style={{ float: 'right' }} primary={true} label="Next Step" onClick={
               () => this.setState ({ step: this.state.step + 1 })
             } disabled={!this.state.completed} /> :
-            <RaisedButton style={{ float: 'right' }} primary={true} label="Publish" onClick={
-              this.publishPoll
-            } />}
+            <RaisedButton style={{ float: 'right' }} primary={true} label="Publish"
+              onClick={this.publishPoll} disabled={!this.state.completed} />}
         </div>
       </div>
     );
@@ -206,6 +207,28 @@ export default React.createClass ({
     });
   },
   publishPoll () {
-    console.log (this.state.poll);
+    this.setState ({ loading: true });
+
+    this.props.dispatch ({
+      type: 'EMIT_SOCKET_IO',
+      api: 'add-poll:req',
+      data: Object.assign ({}, this.state.poll, {
+        $user: this.props.state.user
+      })
+    });
+
+    this.props.state.io.on ('add-poll:res', (data) => {
+      if ( 'server_error' in data ) {
+        console.warn (data.server_error);
+      }
+      else if ( data.error === null ) {
+        this.setState ({ loading: false, published: true });
+      }
+      else {
+        this.setState ({ loading: false, published: true });
+      }
+
+      this.props.state.io.removeListener ('add-poll:res');
+    });
   }
 });

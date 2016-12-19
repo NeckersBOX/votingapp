@@ -56240,7 +56240,11 @@
 
 	var _Paper2 = _interopRequireDefault(_Paper);
 
-	var _NoAuth = __webpack_require__(591);
+	var _CircularProgress = __webpack_require__(591);
+
+	var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
+
+	var _NoAuth = __webpack_require__(593);
 
 	var _NoAuth2 = _interopRequireDefault(_NoAuth);
 
@@ -56269,7 +56273,7 @@
 	        null,
 	        'Chose a name for the poll'
 	      ),
-	      _react2.default.createElement(_TextField2.default, { hintText: 'Ex. Whats your age?', id: 'poll_name', name: 'poll_name', type: 'text',
+	      _react2.default.createElement(_TextField2.default, { hintText: 'Ex. What\'s your age?', id: 'poll_name', name: 'poll_name', type: 'text',
 	        value: this.state.name, onChange: this.changeName }),
 	      _react2.default.createElement(
 	        'p',
@@ -56292,23 +56296,25 @@
 	var AddOption = _react2.default.createClass({
 	  displayName: 'AddOption',
 	  getInitialState: function getInitialState() {
-	    return {
-	      show_btn: true,
-	      option: ''
-	    };
+	    return { option: '' };
 	  },
 	  render: function render() {
 	    var _this = this;
 
-	    if (this.state.show_btn) return _react2.default.createElement(_RaisedButton2.default, { secondary: true, label: 'Add Option', onClick: function onClick() {
-	        return _this.setState({ show_btn: false });
-	      } });
-
 	    return _react2.default.createElement(
-	      'p',
+	      'div',
 	      null,
-	      'Add Option Form'
+	      _react2.default.createElement(_TextField2.default, { hintText: 'Ex. 20 years old', id: 'poll_option', name: 'poll_option', type: 'text',
+	        value: this.state.option, onChange: function onChange(e) {
+	          return _this.setState({ option: e.target.value });
+	        } }),
+	      _react2.default.createElement(_RaisedButton2.default, { secondary: true, label: 'Add Option', onClick: this.sendOption,
+	        disabled: !this.state.option.trim().length })
 	    );
+	  },
+	  sendOption: function sendOption() {
+	    this.setState({ option: '' });
+	    this.props.callback(this.state.option);
 	  }
 	});
 
@@ -56400,17 +56406,6 @@
 	  }
 	});
 
-	var PublishStep = _react2.default.createClass({
-	  displayName: 'PublishStep',
-	  render: function render() {
-	    return _react2.default.createElement(
-	      'p',
-	      null,
-	      'Publish Step'
-	    );
-	  }
-	});
-
 	exports.default = _react2.default.createClass({
 	  displayName: 'AddPollPage',
 	  getInitialState: function getInitialState() {
@@ -56420,13 +56415,27 @@
 	      poll: {
 	        name: '',
 	        options: []
-	      }
+	      },
+	      published: null,
+	      loading: false
 	    };
 	  },
 	  render: function render() {
 	    var _this3 = this;
 
 	    if (typeof this.props.state == 'undefined' || !this.props.state.user) return _react2.default.createElement(_NoAuth2.default, null);
+
+	    if (this.state.loading) return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      _react2.default.createElement(_CircularProgress2.default, { size: 80, thickness: 7 })
+	    );
+
+	    if (this.state.published) return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      this.state.published
+	    );
 
 	    var stepContent = _react2.default.createElement(
 	      'p',
@@ -56439,9 +56448,6 @@
 	        break;
 	      case 1:
 	        stepContent = _react2.default.createElement(OptionsStep, { poll: this.state.poll, completed: this.stepCompleted });
-	        break;
-	      case 2:
-	        stepContent = _react2.default.createElement(PublishStep, { poll: this.state.poll });
 	        break;
 	    }
 
@@ -56476,24 +56482,16 @@
 	              null,
 	              'Options'
 	            )
-	          ),
-	          _react2.default.createElement(
-	            _Stepper.Step,
-	            null,
-	            _react2.default.createElement(
-	              _Stepper.StepLabel,
-	              null,
-	              'Publish'
-	            )
 	          )
 	        ),
 	        stepContent,
 	        this.state.step > 0 ? _react2.default.createElement(_RaisedButton2.default, { style: { float: 'left' }, primary: true, label: 'Previous Step', onClick: function onClick() {
 	            return _this3.setState({ step: _this3.state.step - 1 });
 	          } }) : '',
-	        this.state.step < 2 ? _react2.default.createElement(_RaisedButton2.default, { style: { float: 'right' }, primary: true, label: 'Next Step', onClick: function onClick() {
+	        this.state.step < 1 ? _react2.default.createElement(_RaisedButton2.default, { style: { float: 'right' }, primary: true, label: 'Next Step', onClick: function onClick() {
 	            return _this3.setState({ step: _this3.state.step + 1 });
-	          }, disabled: !this.state.completed }) : _react2.default.createElement(_RaisedButton2.default, { style: { float: 'right' }, primary: true, label: 'Publish', onClick: this.publishPoll })
+	          }, disabled: !this.state.completed }) : _react2.default.createElement(_RaisedButton2.default, { style: { float: 'right' }, primary: true, label: 'Publish',
+	          onClick: this.publishPoll, disabled: !this.state.completed })
 	      )
 	    );
 	  },
@@ -56504,7 +56502,29 @@
 	    });
 	  },
 	  publishPoll: function publishPoll() {
-	    console.log(this.state.poll);
+	    var _this4 = this;
+
+	    this.setState({ loading: true });
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'add-poll:req',
+	      data: Object.assign({}, this.state.poll, {
+	        $user: this.props.state.user
+	      })
+	    });
+
+	    this.props.state.io.on('add-poll:res', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        _this4.setState({ loading: false, published: true });
+	      } else {
+	        _this4.setState({ loading: false, published: true });
+	      }
+
+	      _this4.props.state.io.removeListener('add-poll:res');
+	    });
 	  }
 	});
 
@@ -59051,6 +59071,288 @@
 
 /***/ },
 /* 591 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _CircularProgress = __webpack_require__(592);
+
+	var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	exports.default = _CircularProgress2.default;
+
+/***/ },
+/* 592 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends2 = __webpack_require__(427);
+
+	var _extends3 = _interopRequireDefault(_extends2);
+
+	var _objectWithoutProperties2 = __webpack_require__(432);
+
+	var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+	var _getPrototypeOf = __webpack_require__(400);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(398);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(403);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(407);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(408);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _simpleAssign = __webpack_require__(433);
+
+	var _simpleAssign2 = _interopRequireDefault(_simpleAssign);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _autoPrefix = __webpack_require__(446);
+
+	var _autoPrefix2 = _interopRequireDefault(_autoPrefix);
+
+	var _transitions = __webpack_require__(435);
+
+	var _transitions2 = _interopRequireDefault(_transitions);
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { default: obj };
+	}
+
+	function getRelativeValue(value, min, max) {
+	  var clampedValue = Math.min(Math.max(min, value), max);
+	  return clampedValue / (max - min);
+	}
+
+	function getArcLength(fraction, props) {
+	  return fraction * Math.PI * (props.size - props.thickness);
+	}
+
+	function getStyles(props, context) {
+	  var max = props.max,
+	      min = props.min,
+	      size = props.size,
+	      value = props.value;
+	  var palette = context.muiTheme.baseTheme.palette;
+
+	  var styles = {
+	    root: {
+	      position: 'relative',
+	      display: 'inline-block',
+	      width: size,
+	      height: size
+	    },
+	    wrapper: {
+	      width: size,
+	      height: size,
+	      display: 'inline-block',
+	      transition: _transitions2.default.create('transform', '20s', null, 'linear'),
+	      transitionTimingFunction: 'linear'
+	    },
+	    svg: {
+	      width: size,
+	      height: size,
+	      position: 'relative'
+	    },
+	    path: {
+	      stroke: props.color || palette.primary1Color,
+	      strokeLinecap: 'round',
+	      transition: _transitions2.default.create('all', '1.5s', null, 'ease-in-out')
+	    }
+	  };
+
+	  if (props.mode === 'determinate') {
+	    var relVal = getRelativeValue(value, min, max);
+	    styles.path.transition = _transitions2.default.create('all', '0.3s', null, 'linear');
+	    styles.path.strokeDasharray = getArcLength(relVal, props) + ', ' + getArcLength(1, props);
+	  }
+
+	  return styles;
+	}
+
+	var CircularProgress = function (_Component) {
+	  (0, _inherits3.default)(CircularProgress, _Component);
+
+	  function CircularProgress() {
+	    (0, _classCallCheck3.default)(this, CircularProgress);
+	    return (0, _possibleConstructorReturn3.default)(this, (CircularProgress.__proto__ || (0, _getPrototypeOf2.default)(CircularProgress)).apply(this, arguments));
+	  }
+
+	  (0, _createClass3.default)(CircularProgress, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.scalePath(this.refs.path);
+	      this.rotateWrapper(this.refs.wrapper);
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      clearTimeout(this.scalePathTimer);
+	      clearTimeout(this.rotateWrapperTimer);
+	    }
+	  }, {
+	    key: 'scalePath',
+	    value: function scalePath(path) {
+	      var _this2 = this;
+
+	      var step = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+	      if (this.props.mode !== 'indeterminate') return;
+
+	      step %= 3;
+
+	      if (step === 0) {
+	        path.style.strokeDasharray = getArcLength(0, this.props) + ', ' + getArcLength(1, this.props);
+	        path.style.strokeDashoffset = 0;
+	        path.style.transitionDuration = '0ms';
+	      } else if (step === 1) {
+	        path.style.strokeDasharray = getArcLength(0.7, this.props) + ', ' + getArcLength(1, this.props);
+	        path.style.strokeDashoffset = getArcLength(-0.3, this.props);
+	        path.style.transitionDuration = '750ms';
+	      } else {
+	        path.style.strokeDasharray = getArcLength(0.7, this.props) + ', ' + getArcLength(1, this.props);
+	        path.style.strokeDashoffset = getArcLength(-1, this.props);
+	        path.style.transitionDuration = '850ms';
+	      }
+
+	      this.scalePathTimer = setTimeout(function () {
+	        return _this2.scalePath(path, step + 1);
+	      }, step ? 750 : 250);
+	    }
+	  }, {
+	    key: 'rotateWrapper',
+	    value: function rotateWrapper(wrapper) {
+	      var _this3 = this;
+
+	      if (this.props.mode !== 'indeterminate') return;
+
+	      _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(0deg)');
+	      _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '0ms');
+
+	      setTimeout(function () {
+	        _autoPrefix2.default.set(wrapper.style, 'transform', 'rotate(1800deg)');
+	        _autoPrefix2.default.set(wrapper.style, 'transitionDuration', '10s');
+	        _autoPrefix2.default.set(wrapper.style, 'transitionTimingFunction', 'linear');
+	      }, 50);
+
+	      this.rotateWrapperTimer = setTimeout(function () {
+	        return _this3.rotateWrapper(wrapper);
+	      }, 10050);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          style = _props.style,
+	          innerStyle = _props.innerStyle,
+	          size = _props.size,
+	          thickness = _props.thickness,
+	          other = (0, _objectWithoutProperties3.default)(_props, ['style', 'innerStyle', 'size', 'thickness']);
+	      var prepareStyles = this.context.muiTheme.prepareStyles;
+
+	      var styles = getStyles(this.props, this.context);
+
+	      return _react2.default.createElement('div', (0, _extends3.default)({}, other, { style: prepareStyles((0, _simpleAssign2.default)(styles.root, style)) }), _react2.default.createElement('div', { ref: 'wrapper', style: prepareStyles((0, _simpleAssign2.default)(styles.wrapper, innerStyle)) }, _react2.default.createElement('svg', {
+	        viewBox: '0 0 ' + size + ' ' + size,
+	        style: prepareStyles(styles.svg)
+	      }, _react2.default.createElement('circle', {
+	        ref: 'path',
+	        style: prepareStyles(styles.path),
+	        cx: size / 2,
+	        cy: size / 2,
+	        r: (size - thickness) / 2,
+	        fill: 'none',
+	        strokeWidth: thickness,
+	        strokeMiterlimit: '20'
+	      }))));
+	    }
+	  }]);
+	  return CircularProgress;
+	}(_react.Component);
+
+	CircularProgress.defaultProps = {
+	  mode: 'indeterminate',
+	  value: 0,
+	  min: 0,
+	  max: 100,
+	  size: 40,
+	  thickness: 3.5
+	};
+	CircularProgress.contextTypes = {
+	  muiTheme: _react.PropTypes.object.isRequired
+	};
+	 false ? CircularProgress.propTypes = {
+	  /**
+	   * Override the progress's color.
+	   */
+	  color: _react.PropTypes.string,
+	  /**
+	   * Style for inner wrapper div.
+	   */
+	  innerStyle: _react.PropTypes.object,
+	  /**
+	   * The max value of progress, only works in determinate mode.
+	   */
+	  max: _react.PropTypes.number,
+	  /**
+	   * The min value of progress, only works in determinate mode.
+	   */
+	  min: _react.PropTypes.number,
+	  /**
+	   * The mode of show your progress, indeterminate
+	   * for when there is no value for progress.
+	   */
+	  mode: _react.PropTypes.oneOf(['determinate', 'indeterminate']),
+	  /**
+	   * The diameter of the progress in pixels.
+	   */
+	  size: _react.PropTypes.number,
+	  /**
+	   * Override the inline-styles of the root element.
+	   */
+	  style: _react.PropTypes.object,
+	  /**
+	   * Stroke width in pixels.
+	   */
+	  thickness: _react.PropTypes.number,
+	  /**
+	   * The value of progress, only works in determinate mode.
+	   */
+	  value: _react.PropTypes.number
+	} : void 0;
+	exports.default = CircularProgress;
+
+/***/ },
+/* 593 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
