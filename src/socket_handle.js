@@ -6,6 +6,7 @@ import logout_handle from './socket_handles/logout';
 import addpoll_handle from './socket_handles/addpoll';
 import mypolls_handle from './socket_handles/mypolls';
 import auth_handle from './socket_handles/auth';
+import rmpoll_handle from './socket_handles/rmpoll';
 
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
@@ -14,6 +15,7 @@ const socket_handle = (io) => {
     socket.on ('auth:req', (data) => auth_handle (socket, data));
     socket.on ('logout:req', (data) => logout_handle (socket, data));
     socket.on ('add-poll:req', (data) => addpoll_handle (socket, data));
+    socket.on ('rm-poll:req', (data) => rmpoll_handle (socket, data));
     socket.on ('my-polls:req', (data) => mypolls_handle (socket, data));
   });
 

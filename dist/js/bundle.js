@@ -59503,6 +59503,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(215);
+
 	var _CircularProgress = __webpack_require__(537);
 
 	var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
@@ -59521,6 +59523,10 @@
 
 	var _IconMenu2 = _interopRequireDefault(_IconMenu);
 
+	var _FontIcon = __webpack_require__(463);
+
+	var _FontIcon2 = _interopRequireDefault(_FontIcon);
+
 	var _MenuItem = __webpack_require__(606);
 
 	var _MenuItem2 = _interopRequireDefault(_MenuItem);
@@ -59538,6 +59544,8 @@
 	var MyPollsList = _react2.default.createClass({
 	  displayName: 'MyPollsList',
 	  render: function render() {
+	    var _this = this;
+
 	    var listPollsItem = this.props.polls.map(function (val, id) {
 	      var date = new Date(val.published_time * 1000);
 	      var month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -59552,13 +59560,27 @@
 	            _react2.default.createElement(_moreVert2.default, null)
 	          ) },
 	        _react2.default.createElement(
-	          _MenuItem2.default,
-	          null,
-	          'Show'
+	          _reactRouter.Link,
+	          { to: '/poll/' + val._id },
+	          _react2.default.createElement(
+	            _MenuItem2.default,
+	            { leftIcon: _react2.default.createElement(
+	                _FontIcon2.default,
+	                { className: 'material-icons' },
+	                'open_in_new'
+	              ) },
+	            'Show'
+	          )
 	        ),
 	        _react2.default.createElement(
 	          _MenuItem2.default,
-	          null,
+	          { onClick: function onClick() {
+	              return _this.props.removePoll(val._id);
+	            }, leftIcon: _react2.default.createElement(
+	              _FontIcon2.default,
+	              { className: 'material-icons' },
+	              'delete'
+	            ) },
 	          'Remove'
 	        )
 	      );
@@ -59587,7 +59609,7 @@
 	    return { loading: true, error: null, polls: [] };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    var _this = this;
+	    var _this2 = this;
 
 	    if (typeof this.props.state == 'undefined' || !this.props.state.user) return;
 
@@ -59601,12 +59623,12 @@
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
 	      } else if (data.error === null) {
-	        _this.setState({ loading: false, polls: data.polls });
+	        _this2.setState({ loading: false, polls: data.polls });
 	      } else {
-	        _this.setState({ loading: false, error: data.error });
+	        _this2.setState({ loading: false, error: data.error });
 	      }
 
-	      _this.props.state.io.removeListener('my-polls:res');
+	      _this2.props.state.io.removeListener('my-polls:res');
 	    });
 	  },
 	  componentDidUnmount: function componentDidUnmount() {
@@ -59647,9 +59669,37 @@
 	      _react2.default.createElement(
 	        _Paper2.default,
 	        { style: { padding: '8px', margin: '8px' } },
-	        _react2.default.createElement(MyPollsList, { polls: this.state.polls })
+	        _react2.default.createElement(MyPollsList, { removePoll: this.removePoll, polls: this.state.polls })
 	      )
 	    );
+	  },
+	  removePoll: function removePoll(poll_id) {
+	    var _this3 = this;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'rm-poll:req',
+	      data: {
+	        poll_id: poll_id,
+	        $user: this.props.state.user
+	      }
+	    });
+
+	    this.props.state.io.on('rm-poll:res', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        var new_polls = _this3.state.polls;
+
+	        _this3.setState({ polls: new_polls.filter(function (val) {
+	            return val._id != poll_id;
+	          }) });
+	      } else {
+	        console.warn(data.error);
+	      }
+
+	      _this3.props.state.io.removeListener('rm-poll:res');
+	    });
 	  }
 	});
 
