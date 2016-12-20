@@ -7,6 +7,8 @@ import addpoll_handle from './socket_handles/addpoll';
 import mypolls_handle from './socket_handles/mypolls';
 import auth_handle from './socket_handles/auth';
 import rmpoll_handle from './socket_handles/rmpoll';
+import popular_handle from './socket_handles/popular';
+import latest_handle from './socket_handles/latest';
 
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
@@ -17,6 +19,8 @@ const socket_handle = (io) => {
     socket.on ('add-poll:req', (data) => addpoll_handle (socket, data));
     socket.on ('rm-poll:req', (data) => rmpoll_handle (socket, data));
     socket.on ('my-polls:req', (data) => mypolls_handle (socket, data));
+    socket.on ('popular:req', (data) => popular_handle (socket, data));
+    socket.on ('latest:req', (data) => latest_handle (socket, data));
   });
 
   /* TODO: on disconnect can be handled? */
@@ -42,7 +46,7 @@ export const authUser = (user_info, callback) => {
   if ( !user_info )
     return callback (null, false);
 
-  if ( process.env.MONGOURI == 'undefined' )
+  if ( typeof process.env.MONGOURI == 'undefined' )
     return callback ('Environment variable MONGOURI not found', false);
 
   MongoClient.connect (process.env.MONGOURI, (err, db) => {
