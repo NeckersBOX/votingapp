@@ -9,6 +9,48 @@ import Paper from 'material-ui/Paper';
 
 import NoAuth from './NoAuth';
 
+const MyPollsList = React.createClass ({
+  render () {
+    let listPollsItem = this.props.polls.map ((val, id) => {
+      let date = new Date (val.published_time * 1000);
+      let month = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July',
+        'August', 'September', 'October', 'November', 'December'
+      ];
+
+      let statsInfo = [
+        date.getDate (), month[date.getMonth ()], date.getFullYear (),
+        date.getHours () + ':' + date.getMinutes (), '- Votes:', val.votes
+      ].join (' ');
+
+      let rightIconMenu = (
+        <IconMenu iconButtonElement={
+          <IconButton touch={true} tooltip="Actions" tooltipPosition="bottom-left">
+            <MoreVertIcon />
+          </IconButton>
+        }>
+          <MenuItem>Show</MenuItem>
+          <MenuItem>Remove</MenuItem>
+        </IconMenu>
+      );
+
+      return (
+        <ListItem key={id} style={{ textAlign: 'left' }} primaryText={val.question} disabled={true}
+          secondaryText={statsInfo} rightIconButton={rightIconMenu} />
+      );
+    });
+
+    if ( this.props.polls.length < 1 )
+      return <h2 className="text-center">No Polls found.</h2>;
+
+    return (
+      <List>
+        {listPollsItem}
+      </List>
+    );
+  }
+});
+
 export default React.createClass ({
   getInitialState () {
     return { loading: true, error: null, polls: [] };
@@ -59,59 +101,13 @@ export default React.createClass ({
         </div>
       );
 
-    let listPolls = (
-      <Paper style={{ padding: '8px', margin: '8px' }}>
-        <h2 className="text-center">No polls found.</h2>
-      </Paper>
-    );
-
-    if ( this.state.polls.length ) {
-      let listPollsItem = this.state.polls.map ((val, id) => {
-        let date = new Date (val.published_time * 1000);
-        let month = [
-          'January', 'February', 'March', 'April', 'May', 'June', 'July',
-          'August', 'September', 'October', 'November', 'December'
-        ];
-
-        let statsInfo = [
-          date.getDate (), month[date.getMonth ()], date.getFullYear (),
-          date.getHours () + ':' + date.getMinutes (), '- Votes:', val.votes
-        ].join (' ');
-
-        let rightIconMenu = (
-          <IconMenu iconButtonElement={
-            <IconButton touch={true} tooltip="Actions" tooltipPosition="bottom-left">
-              <MoreVertIcon />
-            </IconButton>
-          }>
-            <MenuItem>Show</MenuItem>
-            <MenuItem>Remove</MenuItem>
-          </IconMenu>
-        );
-
-        return (
-          <ListItem key={id} style={{ textAlign: 'left' }} primaryText={val.question} disabled={true}
-            secondaryText={statsInfo} rightIconButton={rightIconMenu} />
-        );
-      });
-
-      listPolls = (
-        <Paper style={{ padding: '8px', margin: '8px' }}>
-          <List>
-            {listPollsItem}
-          </List>
-        </Paper>
-      );
-    }
-
     return (
       <div className="align-center">
         <h1>My Polls</h1>
-        {listPolls}
+        <Paper style={{ padding: '8px', margin: '8px' }}>
+          <MyPollsList polls={this.state.polls} />
+        </Paper>
       </div>
     );
-  },
-  removePoll (poll_id) {
-    console.log ('poll_id: ', poll_id);
   }
 })

@@ -1,14 +1,47 @@
 import React from 'react';
+import io from 'socket.io-client';
+import { Link } from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
-import { Link } from 'react-router';
-import io from 'socket.io-client';
+import CircularProgress from 'material-ui/CircularProgress';
 
 export default React.createClass ({
+  getInitialState () {
+    return { loading: true };
+  },
   componentDidMount () {
     if ( this.props.state.io === null ) {
-      this.props.dispatch ({ type: 'SET_SOCKET_IO', data: io () });
+      let socket = io ();
+      this.props.dispatch ({ type: 'SET_SOCKET_IO', data: socket });
+
+      let localUser = localStorage.getItem ('__voteapp_session');
+      if ( localUser !== null && this.props.state.user === null ) {
+        let user = JSON.parse (localUser);
+
+        this.props.dispatch ({
+          type: 'EMIT_SOCKET_IO',
+          api: 'auth:req',
+          data: { $user: user }
+        });
+
+        socket.on ('auth:res', (data) => {
+          if ( 'server_error' in data ) {
+            console.warn (data.server_error);
+          }
+          else if ( data.error === null ) {
+            this.props.dispatch ({
+              type: 'SET_USER',
+              data: user
+            });
+          }
+          else console.warn (data.error);
+
+          this.setState ({ loading: false });
+          socket.removeListener ('auth:res');
+        });
+      }
+      else this.setState ({ loading: false });
     }
   },
   render () {
@@ -16,6 +49,13 @@ export default React.createClass ({
       backgroundColor: 'transparent',
       color: 'white'
     };
+
+    if ( this.state.loading )
+      return (
+        <div className="align-center">
+          <CircularProgress size={80} thickness={7} />
+        </div>
+      );
 
     let AppBarMenu = null;
     if ( typeof this.props.state == 'undefined' || !this.props.state.user  ) {

@@ -20,6 +20,8 @@ export default React.createClass ({
         console.warn (data.server_error);
       }
       else if ( data.error === null ) {
+        localStorage.removeItem ('__voteapp_session');
+        
         this.props.dispatch ({
           type: 'SET_USER',
           data: null

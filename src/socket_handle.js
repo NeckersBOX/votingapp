@@ -5,11 +5,13 @@ import login_handle from './socket_handles/login';
 import logout_handle from './socket_handles/logout';
 import addpoll_handle from './socket_handles/addpoll';
 import mypolls_handle from './socket_handles/mypolls';
+import auth_handle from './socket_handles/auth';
 
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
     socket.on ('signup:req', (data) => signup_handle (socket, data));
     socket.on ('login:req', (data) => login_handle (socket, data));
+    socket.on ('auth:req', (data) => auth_handle (socket, data));
     socket.on ('logout:req', (data) => logout_handle (socket, data));
     socket.on ('add-poll:req', (data) => addpoll_handle (socket, data));
     socket.on ('my-polls:req', (data) => mypolls_handle (socket, data));

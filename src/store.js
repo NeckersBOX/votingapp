@@ -4,8 +4,6 @@ const initState = {
 };
 
 const voteReducer = (state, action) => {
-  {/* User in localStore? */}
-  
   if ( typeof state === 'undefined' ) {
     return initState;
   }
@@ -31,6 +29,9 @@ const emitSocketIO = (state, action) => {
   return state;
 };
 
-const setUser = (state, action) => Object.assign ({}, state, { user: action.data });
+const setUser = (state, action) => {
+  localStorage.setItem ('__voteapp_session', JSON.stringify (action.data));
+  return Object.assign ({}, state, { user: action.data });
+}
 
 export default voteReducer;
