@@ -36223,6 +36223,10 @@
 
 	var _MyPollPage2 = _interopRequireDefault(_MyPollPage);
 
+	var _PollPage = __webpack_require__(607);
+
+	var _PollPage2 = _interopRequireDefault(_PollPage);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var routes = _react2.default.createElement(
@@ -36234,6 +36238,7 @@
 	  _react2.default.createElement(_reactRouter.Route, { path: 'logout', component: _LogoutPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'add-poll', component: _AddPollPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'my-poll', component: _MyPollPage2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'poll/:id', component: _PollPage2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFoundPage2.default })
 	);
 
@@ -62660,6 +62665,164 @@
 	}
 
 	exports.default = _MenuItem2.default;
+
+/***/ },
+/* 607 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Paper = __webpack_require__(436);
+
+	var _Paper2 = _interopRequireDefault(_Paper);
+
+	var _CircularProgress = __webpack_require__(425);
+
+	var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
+
+	var _FlatButton = __webpack_require__(460);
+
+	var _FlatButton2 = _interopRequireDefault(_FlatButton);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ShowOption = _react2.default.createClass({
+	  displayName: 'ShowOption',
+	  getInitialState: function getInitialState() {
+	    return { voted: false };
+	  },
+	  render: function render() {
+	    var percentage = this.props.votes * 100 / (this.props.maxVote ? this.props.maxVote : 1);
+
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h3',
+	        { style: { color: 'rgba(0,0,0,0.89)' } },
+	        this.props.name
+	      ),
+	      _react2.default.createElement('div', { style: {
+	          height: '30px',
+	          width: '100%',
+	          background: 'linear-gradient(to right, #2196F3 ' + percentage + '%, #E0E0E0 ' + percentage + '%'
+	        } }),
+	      _react2.default.createElement(
+	        'h3',
+	        { style: { display: 'inline-block' }, className: 'muted' },
+	        this.props.votes,
+	        ' Vote',
+	        this.props.votes == 1 ? '' : 's'
+	      ),
+	      _react2.default.createElement(_FlatButton2.default, { style: { display: 'inline-block' }, label: this.state.voted ? "It's for you" : "It's for me",
+	        secondary: true, onClick: this.voteOption, disabled: this.state.voted })
+	    );
+	  },
+	  voteOption: function voteOption() {
+	    this.setState({ voted: true });
+	  }
+	});
+
+	var ShowPoll = _react2.default.createClass({
+	  displayName: 'ShowPoll',
+	  render: function render() {
+	    var maxOptVotes = this.props.poll.options.reduce(function (prev, curr) {
+	      return Math.max(curr.votes, prev);
+	    }, 0);
+	    var date = new Date(this.props.poll.published_time * 1000);
+	    var month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+	    var statsInfo = [date.getDate(), month[date.getMonth()], date.getFullYear(), date.getHours() + ':' + date.getMinutes()].join(' ');
+
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        _Paper2.default,
+	        { style: { padding: '8px', margin: '8px' } },
+	        _react2.default.createElement(
+	          'h1',
+	          { className: 'text-center' },
+	          this.props.poll.question
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          { className: 'text-center muted text-small' },
+	          this.props.poll.author,
+	          ', ',
+	          statsInfo
+	        )
+	      ),
+	      this.props.poll.options.sort(function (opt_a, opt_b) {
+	        if (opt_a.votes == opt_b.votes) return opt_a.name < opt_b.name ? -1 : opt_a.name > opt_b.name ? +1 : 0;
+
+	        return opt_b.votes - opt_a.votes;
+	      }).map(function (val, id) {
+	        return _react2.default.createElement(ShowOption, _extends({}, val, { key: id, maxVotes: maxOptVotes }));
+	      })
+	    );
+	  }
+	});
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'PollPage',
+	  getInitialState: function getInitialState() {
+	    return { loading: true, poll: null };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+
+	    if (typeof this.props.state == 'undefined') return;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'poll:req',
+	      data: { poll_id: this.props.params.id }
+	    });
+
+	    this.props.state.io.on('poll:res', function (data) {
+	      if ('server_error' in data) return console.warn(data.server_error);
+
+	      if (data.error) return console.warn(data.error);
+
+	      _this.setState({ loading: false, poll: data.poll });
+	    });
+	  },
+	  componentDidUnmount: function componentDidUnmount() {
+	    if (typeof this.props.state == 'undefined') return;
+
+	    this.props.state.io.removeListener('poll:res');
+	  },
+	  render: function render() {
+	    if (this.state.loading) return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      _react2.default.createElement(_CircularProgress2.default, { size: 80, thickness: 7 })
+	    );
+
+	    if (!this.state.poll) return _react2.default.createElement(
+	      _Paper2.default,
+	      { style: { padding: '8px', margin: '8px' } },
+	      _react2.default.createElement(
+	        'h1',
+	        { className: 'text-center' },
+	        'Poll not found'
+	      )
+	    );
+
+	    return _react2.default.createElement(ShowPoll, { poll: this.state.poll });
+	  }
+	});
 
 /***/ }
 /******/ ]);

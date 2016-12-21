@@ -9,18 +9,20 @@ import auth_handle from './socket_handles/auth';
 import rmpoll_handle from './socket_handles/rmpoll';
 import popular_handle from './socket_handles/popular';
 import latest_handle from './socket_handles/latest';
+import poll_handle from './socket_handles/poll';
 
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
-    socket.on ('signup:req', (data) => signup_handle (socket, data));
-    socket.on ('login:req', (data) => login_handle (socket, data));
-    socket.on ('auth:req', (data) => auth_handle (socket, data));
-    socket.on ('logout:req', (data) => logout_handle (socket, data));
+    socket.on ('signup:req',   (data) => signup_handle  (socket, data));
+    socket.on ('login:req',    (data) => login_handle   (socket, data));
+    socket.on ('auth:req',     (data) => auth_handle    (socket, data));
+    socket.on ('logout:req',   (data) => logout_handle  (socket, data));
+    socket.on ('poll:req',     (data) => poll_handle    (socket, data))
     socket.on ('add-poll:req', (data) => addpoll_handle (socket, data));
-    socket.on ('rm-poll:req', (data) => rmpoll_handle (socket, data));
+    socket.on ('rm-poll:req',  (data) => rmpoll_handle  (socket, data));
     socket.on ('my-polls:req', (data) => mypolls_handle (socket, data));
-    socket.on ('popular:req', (data) => popular_handle (socket, data));
-    socket.on ('latest:req', (data) => latest_handle (socket, data));
+    socket.on ('popular:req',  (data) => popular_handle (socket, data));
+    socket.on ('latest:req',   (data) => latest_handle  (socket, data));
   });
 
   /* TODO: on disconnect can be handled? */
