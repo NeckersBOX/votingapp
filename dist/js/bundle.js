@@ -36339,8 +36339,6 @@
 	  componentDidMount: function componentDidMount() {
 	    var _this = this;
 
-	    if (typeof this.props.state == 'undefined') return;
-
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
 	      api: this.props.type + ':req',
@@ -36367,7 +36365,7 @@
 	    if (this.state.loading) return _react2.default.createElement(
 	      'div',
 	      { className: 'align-center' },
-	      _react2.default.createElement(_CircularProgress2.default, { size: 80, thickness: 7 })
+	      _react2.default.createElement(_CircularProgress2.default, { style: { marginTop: '8px' }, size: 80, thickness: 7 })
 	    );
 
 	    return _react2.default.createElement(
@@ -36408,6 +36406,8 @@
 	exports.default = _react2.default.createClass({
 	  displayName: 'IndexPage',
 	  render: function render() {
+	    var visibleContent = typeof this.props.state != 'undefined' && this.props.state.io;
+
 	    return _react2.default.createElement(
 	      'div',
 	      null,
@@ -36440,7 +36440,7 @@
 	              { className: 'material-icons' },
 	              'terrain'
 	            ) },
-	          _react2.default.createElement(PollsTabContent, _extends({ type: 'popular' }, this.props))
+	          visibleContent ? _react2.default.createElement(PollsTabContent, _extends({ type: 'popular' }, this.props)) : ''
 	        ),
 	        _react2.default.createElement(
 	          _Tabs.Tab,
@@ -36449,7 +36449,7 @@
 	              { className: 'material-icons' },
 	              'format_indent_increase'
 	            ) },
-	          _react2.default.createElement(PollsTabContent, _extends({ type: 'latest' }, this.props))
+	          visibleContent ? _react2.default.createElement(PollsTabContent, _extends({ type: 'latest' }, this.props)) : ''
 	        )
 	      )
 	    );
@@ -43535,12 +43535,6 @@
 	    }
 	  },
 	  render: function render() {
-	    if (this.state.loading) return _react2.default.createElement(
-	      'div',
-	      { className: 'align-center' },
-	      _react2.default.createElement(_CircularProgress2.default, { size: 80, thickness: 7 })
-	    );
-
 	    var AppBarMenu = null;
 	    if (typeof this.props.state == 'undefined' || !this.props.state.user) {
 	      AppBarMenu = _react2.default.createElement(
@@ -43616,6 +43610,8 @@
 	        )
 	      );
 	    }
+
+	    if (this.state.loading) AppBarMenu = _react2.default.createElement(_CircularProgress2.default, { color: '#fff', style: { marginTop: '8px' }, size: 30, thickness: 4 });
 
 	    return _react2.default.createElement(
 	      'div',
@@ -62698,11 +62694,17 @@
 
 	var ShowOption = _react2.default.createClass({
 	  displayName: 'ShowOption',
-	  getInitialState: function getInitialState() {
-	    return { voted: false };
-	  },
 	  render: function render() {
+	    var _this = this;
+
 	    var percentage = this.props.votes * 100 / (this.props.maxVote ? this.props.maxVote : 1);
+	    var voteButton = _react2.default.createElement(_FlatButton2.default, { style: { display: 'inline-block' }, secondary: true,
+	      label: this.props.voted.option ? "It's for you" : "It's for me",
+	      onClick: function onClick() {
+	        return _this.props.vote(_this.props._id);
+	      }, disabled: this.props.voted.option });
+
+	    if (this.props.voted.poll && !this.props.voted.option) voteButton = '';
 
 	    return _react2.default.createElement(
 	      'div',
@@ -62724,18 +62726,20 @@
 	        ' Vote',
 	        this.props.votes == 1 ? '' : 's'
 	      ),
-	      _react2.default.createElement(_FlatButton2.default, { style: { display: 'inline-block' }, label: this.state.voted ? "It's for you" : "It's for me",
-	        secondary: true, onClick: this.voteOption, disabled: this.state.voted })
+	      voteButton
 	    );
-	  },
-	  voteOption: function voteOption() {
-	    this.setState({ voted: true });
 	  }
 	});
 
 	var ShowPoll = _react2.default.createClass({
 	  displayName: 'ShowPoll',
+	  getInitialState: function getInitialState() {
+	    var userVotes = localStorage.getItem('__voteapp_votes');
+	    return { votes: userVotes ? JSON.parse(userVotes) : [] };
+	  },
 	  render: function render() {
+	    var _this2 = this;
+
 	    var maxOptVotes = this.props.poll.options.reduce(function (prev, curr) {
 	      return Math.max(curr.votes, prev);
 	    }, 0);
@@ -62763,14 +62767,52 @@
 	          statsInfo
 	        )
 	      ),
-	      this.props.poll.options.sort(function (opt_a, opt_b) {
+	      this.props.poll.options.map(function (val, id) {
+	        return Object.assign({}, val, { _id: id });
+	      }).sort(function (opt_a, opt_b) {
 	        if (opt_a.votes == opt_b.votes) return opt_a.name < opt_b.name ? -1 : opt_a.name > opt_b.name ? +1 : 0;
 
 	        return opt_b.votes - opt_a.votes;
 	      }).map(function (val, id) {
-	        return _react2.default.createElement(ShowOption, _extends({}, val, { key: id, maxVotes: maxOptVotes }));
+	        var vote = {
+	          poll: false,
+	          option: false
+	        };
+
+	        for (var j in _this2.state.votes) {
+	          if (_this2.state.votes[j].poll == _this2.props.poll._id) {
+	            vote.poll = true;
+	            if (_this2.state.votes[j].option == id) vote.option = true;
+	          }
+	        }
+
+	        return _react2.default.createElement(ShowOption, _extends({}, val, { vote: _this2.voteOpt, key: id, maxVotes: maxOptVotes, voted: vote }));
 	      })
 	    );
+	  },
+	  voteOpt: function voteOpt(option_id) {
+	    var _this3 = this;
+
+	    var votes = this.state.votes;
+	    votes.push({ poll: this.props.poll._id, option: option_id });
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'vote:req',
+	      data: {
+	        poll: this.props.poll._id,
+	        option: option_id
+	      }
+	    });
+
+	    this.props.state.io.on('vote:res', function (data) {
+	      if ('server_error' in data) return console.warn(data.server_error);
+
+	      if (data.error) return console.warn(data.error);
+
+	      _this3.setState({ votes: votes });
+	      localStorage.setItem('__voteapp_votes', JSON.stringify(votes));
+	    });
 	  }
 	});
 
@@ -62780,7 +62822,7 @@
 	    return { loading: true, poll: null };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    var _this = this;
+	    var _this4 = this;
 
 	    if (typeof this.props.state == 'undefined') return;
 
@@ -62795,7 +62837,7 @@
 
 	      if (data.error) return console.warn(data.error);
 
-	      _this.setState({ loading: false, poll: data.poll });
+	      if (data.poll._id == _this4.props.params.id) _this4.setState({ loading: false, poll: data.poll });
 	    });
 	  },
 	  componentDidUnmount: function componentDidUnmount() {
@@ -62820,7 +62862,7 @@
 	      )
 	    );
 
-	    return _react2.default.createElement(ShowPoll, { poll: this.state.poll });
+	    return _react2.default.createElement(ShowPoll, { state: this.props.state, dispatch: this.props.dispatch, poll: this.state.poll });
 	  }
 	});
 

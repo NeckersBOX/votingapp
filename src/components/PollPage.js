@@ -4,11 +4,16 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
 
 const ShowOption = React.createClass ({
-  getInitialState () {
-    return { voted: false };
-  },
   render () {
     let percentage = this.props.votes * 100 / (this.props.maxVote ? this.props.maxVote : 1);
+    let voteButton = (
+      <FlatButton style={{ display: 'inline-block' }} secondary={true}
+        label={this.props.voted.option ? "It's for you" : "It's for me"}
+        onClick={() => this.props.vote (this.props._id)} disabled={this.props.voted.option} />
+    );
+
+    if ( this.props.voted.poll && !this.props.voted.option )
+      voteButton = '';
 
     return (
       <div>
@@ -22,18 +27,18 @@ const ShowOption = React.createClass ({
         <h3 style={{ display: 'inline-block' }} className="muted">
           {this.props.votes} Vote{this.props.votes == 1 ? '' : 's'}
         </h3>
-        <FlatButton style={{ display: 'inline-block' }} label={this.state.voted ?
-          "It's for you" : "It's for me"}
-          secondary={true} onClick={this.voteOption} disabled={this.state.voted} />
+
+        {voteButton}
       </div>
     )
-  },
-  voteOption () {
-    this.setState ({ voted: true });
   }
 });
 
 const ShowPoll = React.createClass ({
+  getInitialState () {
+    let userVotes = localStorage.getItem ('__voteapp_votes');
+    return { votes: userVotes ? JSON.parse (userVotes) : [] };
+  },
   render () {
     let maxOptVotes = this.props.poll.options.reduce ((prev, curr) => Math.max (curr.votes, prev), 0);
     let date = new Date (this.props.poll.published_time * 1000);
@@ -56,17 +61,61 @@ const ShowPoll = React.createClass ({
           </p>
         </Paper>
 
-        {this.props.poll.options.sort ((opt_a, opt_b) => {
-          if ( opt_a.votes == opt_b.votes )
-            return (
-              ( opt_a.name < opt_b.name ) ? -1 :
-              ( opt_a.name > opt_b.name ) ? +1 : 0
-            );
+        {this.props.poll.options
+          .map ((val, id) => Object.assign ({}, val, { _id: id }))
+          .sort ((opt_a, opt_b) => {
+            if ( opt_a.votes == opt_b.votes )
+              return (
+                ( opt_a.name < opt_b.name ) ? -1 :
+                ( opt_a.name > opt_b.name ) ? +1 : 0
+              );
 
-          return opt_b.votes - opt_a.votes;
-        }).map ((val, id) => <ShowOption {...val} key={id} maxVotes={maxOptVotes} />)}
+            return opt_b.votes - opt_a.votes;
+          })
+          .map ((val, id) => {
+            let vote = {
+              poll: false,
+              option: false
+            };
+
+            for ( let j in this.state.votes ) {
+              if ( this.state.votes[j].poll == this.props.poll._id ) {
+                vote.poll = true;
+                if ( this.state.votes[j].option == id )
+                  vote.option = true;
+              }
+            }
+
+            return (
+              <ShowOption {...val} vote={this.voteOpt} key={id} maxVotes={maxOptVotes} voted={vote} />
+            );
+          })}
       </div>
     );
+  },
+  voteOpt (option_id) {
+    let votes = this.state.votes;
+    votes.push ({ poll: this.props.poll._id, option: option_id });
+
+    this.props.dispatch ({
+      type: 'EMIT_SOCKET_IO',
+      api: 'vote:req',
+      data: {
+        poll: this.props.poll._id,
+        option: option_id
+      }
+    });
+
+    this.props.state.io.on ('vote:res', (data) => {
+      if ( 'server_error' in data )
+        return console.warn (data.server_error);
+
+      if ( data.error )
+        return console.warn (data.error);
+
+      this.setState ({ votes: votes });
+      localStorage.setItem ('__voteapp_votes', JSON.stringify (votes));
+    });
   }
 });
 
@@ -91,7 +140,8 @@ export default React.createClass ({
       if ( data.error )
         return console.warn (data.error);
 
-      this.setState ({ loading: false, poll: data.poll });
+      if ( data.poll._id == this.props.params.id )
+        this.setState ({ loading: false, poll: data.poll });
     });
   },
   componentDidUnmount () {
@@ -115,6 +165,6 @@ export default React.createClass ({
         </Paper>
       );
 
-    return <ShowPoll poll={this.state.poll} />
+    return <ShowPoll state={this.props.state} dispatch={this.props.dispatch} poll={this.state.poll} />
   }
 });

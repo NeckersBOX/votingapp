@@ -44,9 +44,6 @@ const PollsTabContent = React.createClass ({
     };
   },
   componentDidMount () {
-    if ( typeof this.props.state == 'undefined' )
-      return;
-
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
       api: this.props.type + ':req',
@@ -75,7 +72,7 @@ const PollsTabContent = React.createClass ({
     if ( this.state.loading )
       return (
         <div className="align-center">
-          <CircularProgress size={80} thickness={7} />
+          <CircularProgress style={{ marginTop: '8px' }} size={80} thickness={7} />
         </div>
       );
 
@@ -120,6 +117,8 @@ const PollsTabContent = React.createClass ({
 
 export default React.createClass ({
   render () {
+    let visibleContent = typeof this.props.state != 'undefined' && this.props.state.io;
+
     return (
       <div>
         <Paper style={{ padding: '8px', marginBottom: '8px' }}>
@@ -134,10 +133,10 @@ export default React.createClass ({
 
         <Tabs className="no-main">
           <Tab label="Popular" icon={<FontIcon className="material-icons">terrain</FontIcon>}>
-            <PollsTabContent type='popular' {...this.props} />
+            { visibleContent ? <PollsTabContent type='popular' {...this.props} /> : '' }
           </Tab>
           <Tab label="Latest" icon={<FontIcon className="material-icons">format_indent_increase</FontIcon>}>
-            <PollsTabContent type='latest' {...this.props} />
+            { visibleContent ? <PollsTabContent type='latest' {...this.props} /> : '' }
           </Tab>
         </Tabs>
       </div>

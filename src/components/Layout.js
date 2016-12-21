@@ -69,13 +69,6 @@ export default React.createClass ({
     }
   },
   render () {
-    if ( this.state.loading )
-      return (
-        <div className="align-center">
-          <CircularProgress size={80} thickness={7} />
-        </div>
-      );
-
     let AppBarMenu = null;
     if ( typeof this.props.state == 'undefined' || !this.props.state.user  ) {
       AppBarMenu = (
@@ -124,6 +117,9 @@ export default React.createClass ({
         </div>
       );
     }
+
+    if ( this.state.loading )
+      AppBarMenu = <CircularProgress color="#fff" style={{ marginTop: '8px' }} size={30} thickness={4} />;
 
     return (
       <div>
