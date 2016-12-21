@@ -6,6 +6,30 @@ import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import CircularProgress from 'material-ui/CircularProgress';
 
+const FlatResponsiveButton = React.createClass ({
+  render () {
+    let buttonStyle = {
+      backgroundColor: 'transparent',
+      color: 'white'
+    };
+
+    return (
+      <div style={{ display: 'inline' }}>
+        <div className="hide-sm">
+          <FlatButton label={this.props.label} style={
+            { backgroundColor: 'transparent', color: 'white' }
+          } icon={this.props.icon} />
+        </div>
+        <div className="show-sm">
+          <FlatButton style={
+            { backgroundColor: 'transparent', color: 'white', minWidth: '48px' }
+          } icon={this.props.icon} />
+        </div>
+      </div>
+    );
+  }
+});
+
 export default React.createClass ({
   getInitialState () {
     return { loading: true };
@@ -45,11 +69,6 @@ export default React.createClass ({
     }
   },
   render () {
-    let buttonStyle = {
-      backgroundColor: 'transparent',
-      color: 'white'
-    };
-
     if ( this.state.loading )
       return (
         <div className="align-center">
@@ -62,19 +81,19 @@ export default React.createClass ({
       AppBarMenu = (
         <div className="appbar-btn">
           <Link to="/">
-            <FlatButton label="Home" style={buttonStyle} icon={
+            <FlatResponsiveButton label="Home" icon={
               <FontIcon className="material-icons">home</FontIcon>
-            }/>
+            } />
           </Link>
           <Link to="/signup">
-            <FlatButton label="Sign Up" style={buttonStyle} icon={
+            <FlatResponsiveButton label="Sign Up" icon={
               <FontIcon className="material-icons">person_add</FontIcon>
-            }/>
+            } />
           </Link>
           <Link to="/login">
-            <FlatButton label="Login" style={buttonStyle} icon={
+            <FlatResponsiveButton label="Login" icon={
               <FontIcon className="material-icons">account_circle</FontIcon>
-            }/>
+            } />
           </Link>
         </div>
       );
@@ -83,24 +102,24 @@ export default React.createClass ({
       AppBarMenu = (
         <div className="appbar-btn">
           <Link to="/">
-            <FlatButton label="Home" style={buttonStyle} icon={
+            <FlatResponsiveButton label="Home" icon={
               <FontIcon className="material-icons">home</FontIcon>
             }/>
           </Link>
           <Link to="/add-poll">
-            <FlatButton label="New Poll" style={buttonStyle} icon={
+            <FlatResponsiveButton label="New Poll" icon={
               <FontIcon className="material-icons">playlist_add</FontIcon>
             }/>
           </Link>
           <Link to="/my-poll">
-            <FlatButton label="My Polls" style={buttonStyle} icon={
+            <FlatResponsiveButton label="My Polls" icon={
               <FontIcon className="material-icons">account_circle</FontIcon>
             }/>
           </Link>
           <Link to="/logout">
-            <FlatButton label="Logout" style={buttonStyle} icon={
+            <FlatResponsiveButton label="Logout" icon={
               <FontIcon className="material-icons">directions_run</FontIcon>
-            }/>
+            } />
           </Link>
         </div>
       );

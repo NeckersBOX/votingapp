@@ -42985,6 +42985,31 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var FlatResponsiveButton = _react2.default.createClass({
+	  displayName: 'FlatResponsiveButton',
+	  render: function render() {
+	    var buttonStyle = {
+	      backgroundColor: 'transparent',
+	      color: 'white'
+	    };
+
+	    return _react2.default.createElement(
+	      'div',
+	      { style: { display: 'inline' } },
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'hide-sm' },
+	        _react2.default.createElement(_FlatButton2.default, { label: this.props.label, style: { backgroundColor: 'transparent', color: 'white' }, icon: this.props.icon })
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'show-sm' },
+	        _react2.default.createElement(_FlatButton2.default, { style: { backgroundColor: 'transparent', color: 'white', minWidth: '48px' }, icon: this.props.icon })
+	      )
+	    );
+	  }
+	});
+
 	exports.default = _react2.default.createClass({
 	  displayName: 'Layout',
 	  getInitialState: function getInitialState() {
@@ -43028,11 +43053,6 @@
 	    }
 	  },
 	  render: function render() {
-	    var buttonStyle = {
-	      backgroundColor: 'transparent',
-	      color: 'white'
-	    };
-
 	    if (this.state.loading) return _react2.default.createElement(
 	      'div',
 	      { className: 'align-center' },
@@ -43047,7 +43067,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'Home', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'home'
@@ -43056,7 +43076,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/signup' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Sign Up', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'Sign Up', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'person_add'
@@ -43065,7 +43085,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/login' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Login', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'Login', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'account_circle'
@@ -43079,7 +43099,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Home', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'Home', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'home'
@@ -43088,7 +43108,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/add-poll' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'New Poll', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'New Poll', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'playlist_add'
@@ -43097,7 +43117,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/my-poll' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'My Polls', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'My Polls', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'account_circle'
@@ -43106,7 +43126,7 @@
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: '/logout' },
-	          _react2.default.createElement(_FlatButton2.default, { label: 'Logout', style: buttonStyle, icon: _react2.default.createElement(
+	          _react2.default.createElement(FlatResponsiveButton, { label: 'Logout', icon: _react2.default.createElement(
 	              _FontIcon2.default,
 	              { className: 'material-icons' },
 	              'directions_run'
