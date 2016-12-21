@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import CircularProgress from 'material-ui/CircularProgress';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import FontIcon from 'material-ui/FontIcon';
 import { List, ListItem } from 'material-ui/List';
@@ -35,7 +36,12 @@ const PollsList = React.createClass ({
 
 const PollsTabContent = React.createClass ({
   getInitialState () {
-    return { loading: true, polls: [] };
+    return {
+      loading: true,
+      polls: [],
+      loading_polls: false,
+      loaded_polls: 0
+    };
   },
   componentDidMount () {
     if ( typeof this.props.state == 'undefined' )
@@ -52,7 +58,11 @@ const PollsTabContent = React.createClass ({
         console.warn (data.server_error);
       }
       else if ( data.error == null ) {
-        this.setState ({ loading: false, polls: data.polls });
+        this.setState ({
+          loading: false,
+          polls: data.polls,
+          loaded_polls: data.polls.length
+        });
       }
       else {
         console.warn (data.error);
@@ -72,8 +82,39 @@ const PollsTabContent = React.createClass ({
     return (
       <div className="align-center">
         <PollsList polls={this.state.polls} />
+        { this.state.loading_polls ?
+          <CircularProgress size={30} thickness={3} />
+          :
+          <FlatButton fullWidth={true} secondary={true} label="Load more polls"
+            onClick={this.loadMorePolls} />
+        }
       </div>
     );
+  },
+  loadMorePolls () {
+    this.setState ({ loading_polls: true });
+
+    this.props.dispatch ({
+      type: 'EMIT_SOCKET_IO',
+      api: this.props.type + ':req',
+      data: { skip: this.state.loaded_polls, limit: 10 }
+    });
+
+    this.props.state.io.on (this.props.type + ':res', (data) => {
+      if ( 'server_error' in data )
+        return console.warn (data.server_error);
+
+      if ( data.error )
+        return console.warn (data.error);
+
+      this.setState ({
+        loading_polls: false,
+        polls: this.state.polls.concat (data.polls),
+        loaded_polls: this.state.polls.length + data.polls.length
+      });
+
+      this.props.state.io.removeListener (this.props.type + ':res');
+    });
   }
 });
 
