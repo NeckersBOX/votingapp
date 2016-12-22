@@ -11,6 +11,7 @@ import popular_handle from './socket_handles/popular';
 import latest_handle from './socket_handles/latest';
 import poll_handle from './socket_handles/poll';
 import vote_handle from './socket_handles/vote';
+import addopt_handle from './socket_handles/addopt';
 
 const socket_handle = (io) => {
   io.on ('connection', (socket) => {
@@ -20,6 +21,7 @@ const socket_handle = (io) => {
     socket.on ('logout:req',   (data) => logout_handle  (io, socket, data));
     socket.on ('poll:req',     (data) => poll_handle    (io, socket, data));
     socket.on ('vote:req',     (data) => vote_handle    (io, socket, data));
+    socket.on ('add-opt:req',  (data) => addopt_handle  (io, socket, data));
     socket.on ('add-poll:req', (data) => addpoll_handle (io, socket, data));
     socket.on ('rm-poll:req',  (data) => rmpoll_handle  (io, socket, data));
     socket.on ('my-polls:req', (data) => mypolls_handle (io, socket, data));

@@ -62692,6 +62692,14 @@
 
 	var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
+	var _RaisedButton = __webpack_require__(439);
+
+	var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
+
+	var _TextField = __webpack_require__(549);
+
+	var _TextField2 = _interopRequireDefault(_TextField);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ShowOption = _react2.default.createClass({
@@ -62755,6 +62763,80 @@
 	  }
 	});
 
+	var AddOptionForm = _react2.default.createClass({
+	  displayName: 'AddOptionForm',
+	  getInitialState: function getInitialState() {
+	    return { auth: false, option: '', loading: false };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    var _this2 = this;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'auth:req',
+	      data: { $user: this.props.state.user }
+	    });
+
+	    this.props.state.io.on('auth:res', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        _this2.setState({ auth: true });
+	      }
+
+	      _this2.props.state.io.removeListener('auth:res');
+	    });
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.props.state.io.removeListener('auth:res');
+	  },
+	  render: function render() {
+	    var _this3 = this;
+
+	    if (!this.state.auth) return _react2.default.createElement('span', null);
+
+	    return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      _react2.default.createElement(
+	        'h2',
+	        null,
+	        'Not enough options? Add another one!'
+	      ),
+	      _react2.default.createElement(_TextField2.default, { hintText: 'Ex. I love potato', id: 'poll_option', name: 'poll_option', type: 'text',
+	        value: this.state.option, onChange: function onChange(e) {
+	          return _this3.setState({ option: e.target.value });
+	        } }),
+	      _react2.default.createElement(_RaisedButton2.default, { secondary: true, label: 'Add Option', onClick: this.sendOption,
+	        disabled: !this.state.option.trim().length || this.loading })
+	    );
+	  },
+	  sendOption: function sendOption() {
+	    var _this4 = this;
+
+	    this.setState({ loading: true });
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'add-opt:req',
+	      data: {
+	        poll: this.props.poll,
+	        option: this.state.option,
+	        $user: this.props.state.user
+	      }
+	    });
+
+	    this.props.state.io.on('add-opt:res', function (data) {
+	      if ('server_error' in data) return console.warn(data.server_error);
+
+	      if (data.error) return console.warn(data.error);
+
+	      _this4.setState({ loading: false, option: '' });
+	      _this4.props.state.io.removeListener('add-opt:res');
+	    });
+	  }
+	});
+
 	var ShowPoll = _react2.default.createClass({
 	  displayName: 'ShowPoll',
 	  getInitialState: function getInitialState() {
@@ -62762,7 +62844,7 @@
 	    return { votes: userVotes ? JSON.parse(userVotes) : [] };
 	  },
 	  render: function render() {
-	    var _this2 = this;
+	    var _this5 = this;
 
 	    var maxOptVotes = this.props.poll.options.reduce(function (prev, curr) {
 	      return Math.max(curr.votes, prev);
@@ -62808,19 +62890,20 @@
 	          option: false
 	        };
 
-	        for (var j in _this2.state.votes) {
-	          if (_this2.state.votes[j].poll._id == _this2.props.poll._id && _this2.state.votes[j].poll.published_time == _this2.props.poll.published_time) {
+	        for (var j in _this5.state.votes) {
+	          if (_this5.state.votes[j].poll._id == _this5.props.poll._id && _this5.state.votes[j].poll.published_time == _this5.props.poll.published_time) {
 	            vote.poll = true;
-	            if (_this2.state.votes[j].option == val._id) vote.option = true;
+	            if (_this5.state.votes[j].option == val._id) vote.option = true;
 	          }
 	        }
 
-	        return _react2.default.createElement(ShowOption, _extends({}, val, { vote: _this2.voteOpt, key: id, maxVotes: maxOptVotes, voted: vote }));
-	      })
+	        return _react2.default.createElement(ShowOption, _extends({}, val, { vote: _this5.voteOpt, key: id, maxVotes: maxOptVotes, voted: vote }));
+	      }),
+	      _react2.default.createElement(AddOptionForm, this.props)
 	    );
 	  },
 	  voteOpt: function voteOpt(option_id) {
-	    var _this3 = this;
+	    var _this6 = this;
 
 	    var votes = this.state.votes;
 	    votes.push({
@@ -62845,7 +62928,7 @@
 
 	      if (data.error) return console.warn(data.error);
 
-	      _this3.setState({ votes: votes });
+	      _this6.setState({ votes: votes });
 	      localStorage.setItem('__voteapp_votes', JSON.stringify(votes));
 	    });
 	  }
@@ -62862,7 +62945,7 @@
 	    this.props.state.io.removeListener('poll:res');
 	  },
 	  render: function render() {
-	    var _this4 = this;
+	    var _this7 = this;
 
 	    if (typeof this.props.state == 'undefined' || !this.props.state.io) return _react2.default.createElement(
 	      'div',
@@ -62883,7 +62966,7 @@
 
 	        if (data.error) return console.warn(data.error);
 
-	        if (data.poll._id == _this4.props.params.id) _this4.setState({ loading: false, poll: data.poll });
+	        if (data.poll._id == _this7.props.params.id) _this7.setState({ loading: false, poll: data.poll });
 	      });
 	    }
 

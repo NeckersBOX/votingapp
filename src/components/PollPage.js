@@ -3,6 +3,8 @@ import { Chart } from 'react-google-charts';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 const ShowOption = React.createClass ({
   render () {
@@ -56,6 +58,72 @@ const ShowChart = React.createClass ({
   },
   toggleState () {
     this.setState ({ resize: 1 - this.state.resize });
+  }
+});
+
+const AddOptionForm = React.createClass ({
+  getInitialState () {
+    return { auth: false, option: '', loading: false };
+  },
+  componentDidMount () {
+    this.props.dispatch ({
+      type: 'EMIT_SOCKET_IO',
+      api: 'auth:req',
+      data: { $user: this.props.state.user }
+    });
+
+    this.props.state.io.on ('auth:res', (data) => {
+      if ( 'server_error' in data ) {
+        console.warn (data.server_error);
+      }
+      else if ( data.error === null ) {
+        this.setState ({ auth: true });
+      }
+
+      this.props.state.io.removeListener ('auth:res');
+    });
+  },
+  componentWillUnmount () {
+    this.props.state.io.removeListener ('auth:res');
+  },
+  render () {
+    if ( !this.state.auth )
+      return <span></span>;
+
+    return (
+      <div className="align-center">
+        <h2>Not enough options? Add another one!</h2>
+        <TextField hintText="Ex. I love potato" id="poll_option" name="poll_option" type="text"
+          value={this.state.option} onChange={(e) => this.setState ({ option: e.target.value })} />
+
+        <RaisedButton secondary={true} label="Add Option" onClick={this.sendOption}
+          disabled={!this.state.option.trim ().length || this.loading} />
+      </div>
+    );
+  },
+  sendOption () {
+    this.setState ({ loading: true });
+
+    this.props.dispatch ({
+      type: 'EMIT_SOCKET_IO',
+      api: 'add-opt:req',
+      data: {
+        poll: this.props.poll,
+        option: this.state.option,
+        $user: this.props.state.user
+      }
+    });
+
+    this.props.state.io.on ('add-opt:res', (data) => {
+      if ( 'server_error' in data )
+        return console.warn (data.server_error);
+
+      if ( data.error )
+        return console.warn (data.error);
+
+      this.setState ({ loading: false, option: '' });
+      this.props.state.io.removeListener ('add-opt:res');
+    })
   }
 });
 
@@ -121,6 +189,8 @@ const ShowPoll = React.createClass ({
               <ShowOption {...val} vote={this.voteOpt} key={id} maxVotes={maxOptVotes} voted={vote} />
             );
           })}
+
+        <AddOptionForm {...this.props} />
       </div>
     );
   },
