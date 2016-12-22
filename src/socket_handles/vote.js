@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { emitObj } from '../socket_handle';
 
-const vote_handle = (socket, data) => {
+const vote_handle = (io, socket, data) => {
   if ( typeof process.env.MONGOURI == 'undefined' )
     return emitObj (socket, 'vote:res', {
       server_error: 'Environment variable MONGOURI not found'
@@ -33,7 +33,7 @@ const vote_handle = (socket, data) => {
           });
 
         emitObj (socket, 'vote:res', { error: null, $close_db: db });
-        emitObj (socket, 'poll:res', { error: null, poll: doc });
+        emitObj (io, 'poll:res', { error: null, poll: doc });
       });
     });
   });

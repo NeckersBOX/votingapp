@@ -62697,7 +62697,7 @@
 	  render: function render() {
 	    var _this = this;
 
-	    var percentage = this.props.votes * 100 / (this.props.maxVote ? this.props.maxVote : 1);
+	    var percentage = this.props.votes * 100 / (this.props.maxVotes ? this.props.maxVotes : 1);
 	    var voteButton = _react2.default.createElement(_FlatButton2.default, { style: { display: 'inline-block' }, secondary: true,
 	      label: this.props.voted.option ? "It's for you" : "It's for me",
 	      onClick: function onClick() {
@@ -62780,9 +62780,9 @@
 	        };
 
 	        for (var j in _this2.state.votes) {
-	          if (_this2.state.votes[j].poll == _this2.props.poll._id) {
+	          if (_this2.state.votes[j].poll._id == _this2.props.poll._id && _this2.state.votes[j].poll.published_time == _this2.props.poll.published_time) {
 	            vote.poll = true;
-	            if (_this2.state.votes[j].option == id) vote.option = true;
+	            if (_this2.state.votes[j].option == val._id) vote.option = true;
 	          }
 	        }
 
@@ -62794,7 +62794,13 @@
 	    var _this3 = this;
 
 	    var votes = this.state.votes;
-	    votes.push({ poll: this.props.poll._id, option: option_id });
+	    votes.push({
+	      poll: {
+	        published_time: this.props.poll.published_time,
+	        _id: this.props.poll._id
+	      },
+	      option: option_id
+	    });
 
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
@@ -62819,37 +62825,43 @@
 	exports.default = _react2.default.createClass({
 	  displayName: 'PollPage',
 	  getInitialState: function getInitialState() {
-	    return { loading: true, poll: null };
+	    return { loading: true, init: false, poll: null };
 	  },
-	  componentDidMount: function componentDidMount() {
-	    var _this4 = this;
-
-	    if (typeof this.props.state == 'undefined') return;
-
-	    this.props.dispatch({
-	      type: 'EMIT_SOCKET_IO',
-	      api: 'poll:req',
-	      data: { poll_id: this.props.params.id }
-	    });
-
-	    this.props.state.io.on('poll:res', function (data) {
-	      if ('server_error' in data) return console.warn(data.server_error);
-
-	      if (data.error) return console.warn(data.error);
-
-	      if (data.poll._id == _this4.props.params.id) _this4.setState({ loading: false, poll: data.poll });
-	    });
-	  },
-	  componentDidUnmount: function componentDidUnmount() {
+	  componentWillUnmount: function componentWillUnmount() {
 	    if (typeof this.props.state == 'undefined') return;
 
 	    this.props.state.io.removeListener('poll:res');
 	  },
 	  render: function render() {
+	    var _this4 = this;
+
+	    if (typeof this.props.state == 'undefined' || !this.props.state.io) return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      _react2.default.createElement(_CircularProgress2.default, { style: { marginTop: '8px' }, size: 80, thickness: 7 })
+	    );
+
+	    if (!this.state.init) {
+	      this.setState({ init: true });
+	      this.props.dispatch({
+	        type: 'EMIT_SOCKET_IO',
+	        api: 'poll:req',
+	        data: { poll_id: this.props.params.id }
+	      });
+
+	      this.props.state.io.on('poll:res', function (data) {
+	        if ('server_error' in data) return console.warn(data.server_error);
+
+	        if (data.error) return console.warn(data.error);
+
+	        if (data.poll._id == _this4.props.params.id) _this4.setState({ loading: false, poll: data.poll });
+	      });
+	    }
+
 	    if (this.state.loading) return _react2.default.createElement(
 	      'div',
 	      { className: 'align-center' },
-	      _react2.default.createElement(_CircularProgress2.default, { size: 80, thickness: 7 })
+	      _react2.default.createElement(_CircularProgress2.default, { style: { marginTop: '8px' }, size: 80, thickness: 7 })
 	    );
 
 	    if (!this.state.poll) return _react2.default.createElement(

@@ -1,6 +1,6 @@
 import { emitObj, authUser } from '../socket_handle';
 
-const auth_handle = (socket, data) => {
+const auth_handle = (io, socket, data) => {
   authUser (data.$user, (err, result) => {
     if ( err )
       return emitObj (socket, 'auth:res', { server_error: err }, console.warn);

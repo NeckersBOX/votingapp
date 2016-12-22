@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { emitObj, authUser } from '../socket_handle';
 
-const mypolls_handle = (socket, data) => {
+const mypolls_handle = (io, socket, data) => {
   authUser (data.$user, (err, result) => {
     if ( err )
       return emitObj (socket, 'my-polls:res', { server_error: err }, console.warn);

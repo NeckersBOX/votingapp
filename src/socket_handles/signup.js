@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import md5 from 'md5';
 import { emitObj, authUser } from '../socket_handle';
 
-const signup_handle = (socket, data) => {
+const signup_handle = (io, socket, data) => {
   authUser (data.$user, (err, result) => {
     if ( err )
       return emitObj (socket, 'signup:res', { server_error: err }, console.warn);

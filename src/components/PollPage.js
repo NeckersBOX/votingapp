@@ -5,7 +5,7 @@ import FlatButton from 'material-ui/FlatButton';
 
 const ShowOption = React.createClass ({
   render () {
-    let percentage = this.props.votes * 100 / (this.props.maxVote ? this.props.maxVote : 1);
+    let percentage = (this.props.votes * 100) / (this.props.maxVotes ? this.props.maxVotes : 1);
     let voteButton = (
       <FlatButton style={{ display: 'inline-block' }} secondary={true}
         label={this.props.voted.option ? "It's for you" : "It's for me"}
@@ -79,9 +79,10 @@ const ShowPoll = React.createClass ({
             };
 
             for ( let j in this.state.votes ) {
-              if ( this.state.votes[j].poll == this.props.poll._id ) {
+              if ( this.state.votes[j].poll._id == this.props.poll._id
+                && this.state.votes[j].poll.published_time == this.props.poll.published_time ) {
                 vote.poll = true;
-                if ( this.state.votes[j].option == id )
+                if ( this.state.votes[j].option == val._id )
                   vote.option = true;
               }
             }
@@ -95,7 +96,13 @@ const ShowPoll = React.createClass ({
   },
   voteOpt (option_id) {
     let votes = this.state.votes;
-    votes.push ({ poll: this.props.poll._id, option: option_id });
+    votes.push ({
+      poll: {
+        published_time: this.props.poll.published_time,
+        _id: this.props.poll._id
+      },
+      option: option_id
+    });
 
     this.props.dispatch ({
       type: 'EMIT_SOCKET_IO',
@@ -121,40 +128,46 @@ const ShowPoll = React.createClass ({
 
 export default React.createClass ({
   getInitialState () {
-    return { loading: true, poll: null };
+    return { loading: true, init: false, poll: null };
   },
-  componentDidMount () {
-    if ( typeof this.props.state == 'undefined' )
-      return;
-
-    this.props.dispatch ({
-      type: 'EMIT_SOCKET_IO',
-      api: 'poll:req',
-      data: { poll_id: this.props.params.id }
-    });
-
-    this.props.state.io.on ('poll:res', (data) => {
-      if ( 'server_error' in data )
-        return console.warn (data.server_error);
-
-      if ( data.error )
-        return console.warn (data.error);
-
-      if ( data.poll._id == this.props.params.id )
-        this.setState ({ loading: false, poll: data.poll });
-    });
-  },
-  componentDidUnmount () {
+  componentWillUnmount () {
     if ( typeof this.props.state == 'undefined' )
       return;
 
     this.props.state.io.removeListener ('poll:res');
   },
   render () {
+    if ( typeof this.props.state == 'undefined' || !this.props.state.io )
+      return (
+        <div className="align-center">
+          <CircularProgress style={{ marginTop: '8px' }} size={80} thickness={7} />
+        </div>
+      );
+
+    if ( !this.state.init ) {
+      this.setState ({ init: true });
+      this.props.dispatch ({
+        type: 'EMIT_SOCKET_IO',
+        api: 'poll:req',
+        data: { poll_id: this.props.params.id }
+      });
+
+      this.props.state.io.on ('poll:res', (data) => {
+        if ( 'server_error' in data )
+          return console.warn (data.server_error);
+
+        if ( data.error )
+          return console.warn (data.error);
+
+        if ( data.poll._id == this.props.params.id )
+          this.setState ({ loading: false, poll: data.poll });
+      });
+    }
+
     if ( this.state.loading )
       return (
         <div className="align-center">
-          <CircularProgress size={80} thickness={7} />
+          <CircularProgress style={{ marginTop: '8px' }} size={80} thickness={7} />
         </div>
       );
 

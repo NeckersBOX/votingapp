@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { emitObj, authUser } from '../socket_handle';
 
-const logout_handle = (socket, data) => {
+const logout_handle = (io, socket, data) => {
   authUser (data.$user, (err, result) => {
     if (err)
       return emitObj (socket, 'logout:res', { server_error: err }, console.warn);

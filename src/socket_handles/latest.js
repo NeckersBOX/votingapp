@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { emitObj } from '../socket_handle';
 
-const latest_handle = (socket, data) => {
+const latest_handle = (io, socket, data) => {
   if ( typeof process.env.MONGOURI == 'undefined' )
     return emitObj (socket, 'latest:res', {
       server_error: 'Environment variable MONGOURI not found'
