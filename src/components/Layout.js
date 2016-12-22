@@ -129,6 +129,18 @@ export default React.createClass ({
         <div className="main">
           {this.props.children}
         </div>
+
+        <div className="divider"></div>
+        
+        <p className="text-center muted text-small">
+          Coded and Written by <a href="http://neckersbox.eu">Davide Francesco Merico</a>.
+        </p>
+        <p className="text-center muted text-small">
+          <a href="https://github.com/NeckersBOX/votingapp">
+            GitHub Project
+          </a>
+        </p>
+
       </div>
     );
   }

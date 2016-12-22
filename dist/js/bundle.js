@@ -43621,6 +43621,27 @@
 	        'div',
 	        { className: 'main' },
 	        this.props.children
+	      ),
+	      _react2.default.createElement('div', { className: 'divider' }),
+	      _react2.default.createElement(
+	        'p',
+	        { className: 'text-center muted text-small' },
+	        'Coded and Written by ',
+	        _react2.default.createElement(
+	          'a',
+	          { href: 'http://neckersbox.eu' },
+	          'Davide Francesco Merico'
+	        ),
+	        '.'
+	      ),
+	      _react2.default.createElement(
+	        'p',
+	        { className: 'text-center muted text-small' },
+	        _react2.default.createElement(
+	          'a',
+	          { href: 'https://github.com/NeckersBOX/votingapp' },
+	          'GitHub Project'
+	        )
 	      )
 	    );
 	  }
