@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm start-server-debug",
     "start-server": ": $(node_modules/.bin/babel-node --presets 'react,es2015' src/server.js)",
     "start-server-debug": "node_modules/.bin/babel-node --presets 'react,es2015' src/server.js",
     "stop-server": ": $(killall node nodejs)",
