@@ -62700,6 +62700,10 @@
 
 	var _TextField2 = _interopRequireDefault(_TextField);
 
+	var _FontIcon = __webpack_require__(468);
+
+	var _FontIcon2 = _interopRequireDefault(_FontIcon);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ShowOption = _react2.default.createClass({
@@ -62763,10 +62767,10 @@
 	  }
 	});
 
-	var AddOptionForm = _react2.default.createClass({
-	  displayName: 'AddOptionForm',
+	var ShareButtons = _react2.default.createClass({
+	  displayName: 'ShareButtons',
 	  getInitialState: function getInitialState() {
-	    return { auth: false, option: '', loading: false };
+	    return { auth: false };
 	  },
 	  componentDidMount: function componentDidMount() {
 	    var _this2 = this;
@@ -62780,18 +62784,76 @@
 	    this.props.state.io.on('auth:res', function (data) {
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
-	      } else if (data.error === null) {
+	      } else if (data.error === null && _this2.props.poll.author == _this2.props.state.user.name) {
 	        _this2.setState({ auth: true });
 	      }
 
 	      _this2.props.state.io.removeListener('auth:res');
 	    });
 	  },
+	  render: function render() {
+	    if (!this.state.auth) return _react2.default.createElement('span', null);
+
+	    var poll_url = 'https%3A//neckers-voteapp.herokuapp.com%20/poll/' + this.props.poll._id;
+
+	    return _react2.default.createElement(
+	      'div',
+	      { className: 'align-center' },
+	      _react2.default.createElement(_RaisedButton2.default, { label: 'facebook', secondary: true,
+	        href: "https://www.facebook.com/sharer/sharer.php?u=" + poll_url,
+	        icon: _react2.default.createElement(
+	          _FontIcon2.default,
+	          { className: 'material-icons' },
+	          'share'
+	        ) }),
+	      _react2.default.createElement(_RaisedButton2.default, { label: 'twitter', secondary: true,
+	        href: "https://twitter.com/home?status=Tell%20us%20your%20opinion!%20-%20" + poll_url,
+	        icon: _react2.default.createElement(
+	          _FontIcon2.default,
+	          { className: 'material-icons' },
+	          'share'
+	        ),
+	        style: { marginLeft: '5px' } }),
+	      _react2.default.createElement(_RaisedButton2.default, { label: 'linkedin', secondary: true,
+	        href: "https://www.linkedin.com/shareArticle?mini=true&url=" + poll_url + "&title=" + this.props.poll.name, style: { marginLeft: '5px' },
+	        icon: _react2.default.createElement(
+	          _FontIcon2.default,
+	          { className: 'material-icons' },
+	          'share'
+	        ) })
+	    );
+	  }
+	});
+
+	var AddOptionForm = _react2.default.createClass({
+	  displayName: 'AddOptionForm',
+	  getInitialState: function getInitialState() {
+	    return { auth: false, option: '', loading: false };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    var _this3 = this;
+
+	    this.props.dispatch({
+	      type: 'EMIT_SOCKET_IO',
+	      api: 'auth:req',
+	      data: { $user: this.props.state.user }
+	    });
+
+	    this.props.state.io.on('auth:res', function (data) {
+	      if ('server_error' in data) {
+	        console.warn(data.server_error);
+	      } else if (data.error === null) {
+	        _this3.setState({ auth: true });
+	      }
+
+	      _this3.props.state.io.removeListener('auth:res');
+	    });
+	  },
 	  componentWillUnmount: function componentWillUnmount() {
 	    this.props.state.io.removeListener('auth:res');
 	  },
 	  render: function render() {
-	    var _this3 = this;
+	    var _this4 = this;
 
 	    if (!this.state.auth) return _react2.default.createElement('span', null);
 
@@ -62805,14 +62867,14 @@
 	      ),
 	      _react2.default.createElement(_TextField2.default, { hintText: 'Ex. I love potato', id: 'poll_option', name: 'poll_option', type: 'text',
 	        value: this.state.option, onChange: function onChange(e) {
-	          return _this3.setState({ option: e.target.value });
+	          return _this4.setState({ option: e.target.value });
 	        } }),
 	      _react2.default.createElement(_RaisedButton2.default, { secondary: true, label: 'Add Option', onClick: this.sendOption,
 	        disabled: !this.state.option.trim().length || this.loading })
 	    );
 	  },
 	  sendOption: function sendOption() {
-	    var _this4 = this;
+	    var _this5 = this;
 
 	    this.setState({ loading: true });
 
@@ -62831,8 +62893,8 @@
 
 	      if (data.error) return console.warn(data.error);
 
-	      _this4.setState({ loading: false, option: '' });
-	      _this4.props.state.io.removeListener('add-opt:res');
+	      _this5.setState({ loading: false, option: '' });
+	      _this5.props.state.io.removeListener('add-opt:res');
 	    });
 	  }
 	});
@@ -62844,7 +62906,7 @@
 	    return { votes: userVotes ? JSON.parse(userVotes) : [] };
 	  },
 	  render: function render() {
-	    var _this5 = this;
+	    var _this6 = this;
 
 	    var maxOptVotes = this.props.poll.options.reduce(function (prev, curr) {
 	      return Math.max(curr.votes, prev);
@@ -62879,7 +62941,8 @@
 	          this.props.poll.author,
 	          ', ',
 	          statsInfo
-	        )
+	        ),
+	        _react2.default.createElement(ShareButtons, this.props)
 	      ),
 	      _react2.default.createElement(ShowChart, { maxVotes: maxOptVotes, data: [['Option', 'Votes']].concat(pollOptions.map(function (val) {
 	          return [val.name, val.votes];
@@ -62890,20 +62953,20 @@
 	          option: false
 	        };
 
-	        for (var j in _this5.state.votes) {
-	          if (_this5.state.votes[j].poll._id == _this5.props.poll._id && _this5.state.votes[j].poll.published_time == _this5.props.poll.published_time) {
+	        for (var j in _this6.state.votes) {
+	          if (_this6.state.votes[j].poll._id == _this6.props.poll._id && _this6.state.votes[j].poll.published_time == _this6.props.poll.published_time) {
 	            vote.poll = true;
-	            if (_this5.state.votes[j].option == val._id) vote.option = true;
+	            if (_this6.state.votes[j].option == val._id) vote.option = true;
 	          }
 	        }
 
-	        return _react2.default.createElement(ShowOption, _extends({}, val, { vote: _this5.voteOpt, key: id, maxVotes: maxOptVotes, voted: vote }));
+	        return _react2.default.createElement(ShowOption, _extends({}, val, { vote: _this6.voteOpt, key: id, maxVotes: maxOptVotes, voted: vote }));
 	      }),
 	      _react2.default.createElement(AddOptionForm, this.props)
 	    );
 	  },
 	  voteOpt: function voteOpt(option_id) {
-	    var _this6 = this;
+	    var _this7 = this;
 
 	    var votes = this.state.votes;
 	    votes.push({
@@ -62928,7 +62991,7 @@
 
 	      if (data.error) return console.warn(data.error);
 
-	      _this6.setState({ votes: votes });
+	      _this7.setState({ votes: votes });
 	      localStorage.setItem('__voteapp_votes', JSON.stringify(votes));
 	    });
 	  }
@@ -62945,7 +63008,7 @@
 	    this.props.state.io.removeListener('poll:res');
 	  },
 	  render: function render() {
-	    var _this7 = this;
+	    var _this8 = this;
 
 	    if (typeof this.props.state == 'undefined' || !this.props.state.io) return _react2.default.createElement(
 	      'div',
@@ -62966,7 +63029,7 @@
 
 	        if (data.error) return console.warn(data.error);
 
-	        if (data.poll._id == _this7.props.params.id) _this7.setState({ loading: false, poll: data.poll });
+	        if (data.poll._id == _this8.props.params.id) _this8.setState({ loading: false, poll: data.poll });
 	      });
 	    }
 

@@ -5,6 +5,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import FontIcon from 'material-ui/FontIcon';
 
 const ShowOption = React.createClass ({
   render () {
@@ -58,6 +59,53 @@ const ShowChart = React.createClass ({
   },
   toggleState () {
     this.setState ({ resize: 1 - this.state.resize });
+  }
+});
+
+const ShareButtons = React.createClass ({
+  getInitialState () {
+    return { auth: false };
+  },
+  componentDidMount () {
+    this.props.dispatch ({
+      type: 'EMIT_SOCKET_IO',
+      api: 'auth:req',
+      data: { $user: this.props.state.user }
+    });
+
+    this.props.state.io.on ('auth:res', (data) => {
+      if ( 'server_error' in data ) {
+        console.warn (data.server_error);
+      }
+      else if ( data.error === null
+        && this.props.poll.author == this.props.state.user.name ) {
+        this.setState ({ auth: true });
+      }
+
+      this.props.state.io.removeListener ('auth:res');
+    });
+  },
+  render () {
+    if ( !this.state.auth )
+      return <span></span>;
+
+    let poll_url = 'https%3A//neckers-voteapp.herokuapp.com%20/poll/' + this.props.poll._id;
+
+    return (
+      <div className="align-center">
+        <RaisedButton label="facebook" secondary={true}
+          href={"https://www.facebook.com/sharer/sharer.php?u=" + poll_url}
+          icon={<FontIcon className="material-icons">share</FontIcon>} />
+        <RaisedButton label="twitter" secondary={true}
+          href={"https://twitter.com/home?status=Tell%20us%20your%20opinion!%20-%20" + poll_url}
+          icon={<FontIcon className="material-icons">share</FontIcon>}
+          style={{ marginLeft: '5px' }}/>
+        <RaisedButton label="linkedin" secondary={true}
+          href={"https://www.linkedin.com/shareArticle?mini=true&url=" + poll_url
+            + "&title=" + this.props.poll.name} style={{ marginLeft: '5px' }}
+          icon={<FontIcon className="material-icons">share</FontIcon>}/>
+      </div>
+    );
   }
 });
 
@@ -164,6 +212,7 @@ const ShowPoll = React.createClass ({
           <p className="text-center muted text-small">
             {this.props.poll.author}, {statsInfo}
           </p>
+          <ShareButtons {...this.props} />
         </Paper>
 
         <ShowChart maxVotes={maxOptVotes} data={[
