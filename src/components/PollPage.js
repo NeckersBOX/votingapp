@@ -89,21 +89,24 @@ const ShareButtons = React.createClass ({
     if ( !this.state.auth )
       return <span></span>;
 
-    let poll_url = 'https%3A//neckers-voteapp.herokuapp.com%20/poll/' + this.props.poll._id;
-
+    let poll_url = 'https://neckers-voteapp.herokuapp.com/poll/' + this.props.poll._id;
+    console.log (this.props);
     return (
       <div className="align-center">
-        <RaisedButton label="facebook" secondary={true}
-          href={"https://www.facebook.com/sharer/sharer.php?u=" + poll_url}
-          icon={<FontIcon className="material-icons">share</FontIcon>} />
-        <RaisedButton label="twitter" secondary={true}
-          href={"https://twitter.com/home?status=Tell%20us%20your%20opinion!%20-%20" + poll_url}
-          icon={<FontIcon className="material-icons">share</FontIcon>}
-          style={{ marginLeft: '5px' }}/>
-        <RaisedButton label="linkedin" secondary={true}
-          href={"https://www.linkedin.com/shareArticle?mini=true&url=" + poll_url
-            + "&title=" + this.props.poll.name} style={{ marginLeft: '5px' }}
-          icon={<FontIcon className="material-icons">share</FontIcon>}/>
+        <a href={"https://www.facebook.com/sharer/sharer.php?u=" + poll_url}>
+          <RaisedButton label="facebook" secondary={true}
+            icon={<FontIcon className="material-icons">share</FontIcon>} />
+        </a>
+        <a href={"https://twitter.com/home?status=Tell%20us%20your%20opinion!%20-%20" + poll_url}>
+          <RaisedButton label="twitter" secondary={true}
+            icon={<FontIcon className="material-icons">share</FontIcon>}
+            style={{ marginLeft: '5px' }}/>
+        </a>
+        <a href={"https://www.linkedin.com/shareArticle?mini=true&url=" + poll_url
+          + "&title=" + this.props.poll.question}>
+          <RaisedButton label="linkedin" secondary={true}
+            style={{ marginLeft: '5px' }} icon={<FontIcon className="material-icons">share</FontIcon>}/>
+        </a>
       </div>
     );
   }

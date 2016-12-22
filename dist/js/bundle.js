@@ -57671,6 +57671,10 @@
 
 	var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
 
+	var _CircularProgress = __webpack_require__(425);
+
+	var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -57678,7 +57682,7 @@
 	exports.default = _react2.default.createClass({
 	  displayName: 'LoginPage',
 	  getInitialState: function getInitialState() {
-	    return { name: '', pass: '', error: null };
+	    return { name: '', pass: '', error: null, load: false };
 	  },
 	  render: function render() {
 	    var _this = this;
@@ -57743,7 +57747,7 @@
 	      _react2.default.createElement(
 	        'div',
 	        { className: 'align-center' },
-	        _react2.default.createElement(_RaisedButton2.default, { primary: true, onClick: this.login, label: 'Login' })
+	        this.state.load ? _react2.default.createElement(_CircularProgress2.default, { style: { marginTop: '8px' }, size: 40, thickness: 5 }) : _react2.default.createElement(_RaisedButton2.default, { primary: true, onClick: this.login, label: 'Login' })
 	      )
 	    );
 	  },
@@ -57753,6 +57757,8 @@
 	  login: function login() {
 	    var _this2 = this;
 
+	    this.setState({ load: true });
+
 	    this.props.dispatch({
 	      type: 'EMIT_SOCKET_IO',
 	      api: 'login:req',
@@ -57760,6 +57766,8 @@
 	    });
 
 	    this.props.state.io.on('login:res', function (data) {
+	      _this2.setState({ load: false });
+
 	      if ('server_error' in data) {
 	        console.warn(data.server_error);
 	      } else if (data.error === null) {
@@ -62794,33 +62802,42 @@
 	  render: function render() {
 	    if (!this.state.auth) return _react2.default.createElement('span', null);
 
-	    var poll_url = 'https%3A//neckers-voteapp.herokuapp.com%20/poll/' + this.props.poll._id;
-
+	    var poll_url = 'https://neckers-voteapp.herokuapp.com/poll/' + this.props.poll._id;
+	    console.log(this.props);
 	    return _react2.default.createElement(
 	      'div',
 	      { className: 'align-center' },
-	      _react2.default.createElement(_RaisedButton2.default, { label: 'facebook', secondary: true,
-	        href: "https://www.facebook.com/sharer/sharer.php?u=" + poll_url,
-	        icon: _react2.default.createElement(
-	          _FontIcon2.default,
-	          { className: 'material-icons' },
-	          'share'
-	        ) }),
-	      _react2.default.createElement(_RaisedButton2.default, { label: 'twitter', secondary: true,
-	        href: "https://twitter.com/home?status=Tell%20us%20your%20opinion!%20-%20" + poll_url,
-	        icon: _react2.default.createElement(
-	          _FontIcon2.default,
-	          { className: 'material-icons' },
-	          'share'
-	        ),
-	        style: { marginLeft: '5px' } }),
-	      _react2.default.createElement(_RaisedButton2.default, { label: 'linkedin', secondary: true,
-	        href: "https://www.linkedin.com/shareArticle?mini=true&url=" + poll_url + "&title=" + this.props.poll.name, style: { marginLeft: '5px' },
-	        icon: _react2.default.createElement(
-	          _FontIcon2.default,
-	          { className: 'material-icons' },
-	          'share'
-	        ) })
+	      _react2.default.createElement(
+	        'a',
+	        { href: "https://www.facebook.com/sharer/sharer.php?u=" + poll_url },
+	        _react2.default.createElement(_RaisedButton2.default, { label: 'facebook', secondary: true,
+	          icon: _react2.default.createElement(
+	            _FontIcon2.default,
+	            { className: 'material-icons' },
+	            'share'
+	          ) })
+	      ),
+	      _react2.default.createElement(
+	        'a',
+	        { href: "https://twitter.com/home?status=Tell%20us%20your%20opinion!%20-%20" + poll_url },
+	        _react2.default.createElement(_RaisedButton2.default, { label: 'twitter', secondary: true,
+	          icon: _react2.default.createElement(
+	            _FontIcon2.default,
+	            { className: 'material-icons' },
+	            'share'
+	          ),
+	          style: { marginLeft: '5px' } })
+	      ),
+	      _react2.default.createElement(
+	        'a',
+	        { href: "https://www.linkedin.com/shareArticle?mini=true&url=" + poll_url + "&title=" + this.props.poll.question },
+	        _react2.default.createElement(_RaisedButton2.default, { label: 'linkedin', secondary: true,
+	          style: { marginLeft: '5px' }, icon: _react2.default.createElement(
+	            _FontIcon2.default,
+	            { className: 'material-icons' },
+	            'share'
+	          ) })
+	      )
 	    );
 	  }
 	});
