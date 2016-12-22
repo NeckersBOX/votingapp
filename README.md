@@ -29,13 +29,15 @@ _Note_:
 Ok, they aren't really features, but there are some actions _not really good_ but ,for this challenge, I don't mind.
 
 - I can vote multiple times if I clear my local storage or I do an access from another device ( or I go in incognito mode, etc.. ).
- - Yes, because to get track of the votes I have to save some informations in server side and, with users without login, I've to do a really hard work to check them. So.. the DB is in a sandbox powered by mlab and I don't want to stress it more.
+ - Yeah, because to get track of the votes I have to save some informations in server side and, with users without login, I've to do a really hard work to check them. So.. the DB is in a sandbox powered by mlab and I don't want to stress it more.
 - I can't edit or remove options after the poll publish.
  - No, you can't. These actions weren't in the user stories.
 - I can't have multiple logins.
   - Yep, everytime you do a login you get a different `session_id` in both side: client and server.
 - I can't edit my personal data, like e-mail, nick or password
   - No, you can't. These actions weren't in the user stories.
+- I can't change my preferences
+  - Yes, I don't like this _feature_ in special way but I've decided to not implement an _UNDO_ action for some security reasons.  
 
 ### `process.env`
 * __MONGOURI__: your query to authenticate in mongodb server `mongodb://<dbuser>:<dbpassword>@ds119508.mlab.com:19508/neckersbox`
