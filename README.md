@@ -1,7 +1,7 @@
 # Vote App
 
 ![Build Passed](https://img.shields.io/badge/build-passed-lightgrey.svg)
-![Status Alpha](https://img.shields.io/badge/status-alpha-bronze.svg)
+![Status Beta](https://img.shields.io/badge/status-beta-blue.svg)
 
 ## Free Code Camp Challenge
 
@@ -26,7 +26,7 @@ _Note_:
 ### It's a bug? No, it's a feature!
 Ok, they aren't really features, but there are some actions _not really good_ but ,for this challenge, I don't mind.
 
-- I can vote multiple times if clear my local storage or I do an access from another device ( or I go in incognito mode, etc.. ).
+- I can vote multiple times if I clear my local storage or I do an access from another device ( or I go in incognito mode, etc.. ).
  - Yes, because to get track of the votes I have to save some informations in server side and, with users without login, I've to do a really hard work to check them. So.. the DB is in a sandbox powered by mlab and I don't want to stress it more.
 - I can't edit or remove options after the poll publish.
  - No, you can't. These actions weren't in the user stories.
