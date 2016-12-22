@@ -1,4 +1,5 @@
 import React from 'react';
+import { Chart } from 'react-google-charts';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
@@ -34,6 +35,30 @@ const ShowOption = React.createClass ({
   }
 });
 
+const ShowChart = React.createClass ({
+  getInitialState () {
+    return { resize: 0 };
+  },
+  componentDidMount () {
+    window.addEventListener ('resize', this.toggleState);
+  },
+  componentWillUnmount () {
+    window.removeEventListener ('resize', this.toggleState);
+  },
+  render () {
+    if ( !this.props.maxVotes )
+      return <span></span>;
+
+    return (
+      <Chart chartType="PieChart" options={{ legend: 'none' }} graph_id={"PollPieChart" + this.state.resize}
+        width="100%" height="400px" data={this.props.data} legend_toggle />
+    );
+  },
+  toggleState () {
+    this.setState ({ resize: 1 - this.state.resize });
+  }
+});
+
 const ShowPoll = React.createClass ({
   getInitialState () {
     let userVotes = localStorage.getItem ('__voteapp_votes');
@@ -52,6 +77,18 @@ const ShowPoll = React.createClass ({
       date.getHours () + ':' + date.getMinutes ()
     ].join (' ');
 
+    let pollOptions = this.props.poll.options
+      .map ((val, id) => Object.assign ({}, val, { _id: id }))
+      .sort ((opt_a, opt_b) => {
+        if ( opt_a.votes == opt_b.votes )
+          return (
+            ( opt_a.name < opt_b.name ) ? -1 :
+            ( opt_a.name > opt_b.name ) ? +1 : 0
+          );
+
+        return opt_b.votes - opt_a.votes;
+      });
+
     return (
       <div>
         <Paper style={{ padding: '8px', margin: '8px' }}>
@@ -61,18 +98,11 @@ const ShowPoll = React.createClass ({
           </p>
         </Paper>
 
-        {this.props.poll.options
-          .map ((val, id) => Object.assign ({}, val, { _id: id }))
-          .sort ((opt_a, opt_b) => {
-            if ( opt_a.votes == opt_b.votes )
-              return (
-                ( opt_a.name < opt_b.name ) ? -1 :
-                ( opt_a.name > opt_b.name ) ? +1 : 0
-              );
+        <ShowChart maxVotes={maxOptVotes} data={[
+          ['Option', 'Votes']
+        ].concat (pollOptions.map ((val) => [ val.name, val.votes ]))} />
 
-            return opt_b.votes - opt_a.votes;
-          })
-          .map ((val, id) => {
+        {pollOptions.map ((val, id) => {
             let vote = {
               poll: false,
               option: false
